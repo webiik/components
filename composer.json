@@ -1,0 +1,30 @@
+{
+  "name": "webiik/webiik",
+  "type": "library",
+  "description": "Webiik is full-pfelged PHP framework focused on efficiency, simplicity and flexibility.",
+  "keywords": ["framework", "lightweight", "simple", "fast", "easy", "webiik"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "pimple/pimple": "^3"
+  },
+  "require-dev": {
+    "phpmd/phpmd" : "@stable",
+    "squizlabs/php_codesniffer": "^3",
+    "phpunit/phpunit": "^7",
+    "phpstan/phpstan": "^0.10",
+    "phpmetrics/phpmetrics": "^2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\": "src/Webiik/"
+    }
+  }
+}
