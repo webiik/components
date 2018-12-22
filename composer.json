@@ -1,0 +1,29 @@
+{
+  "name": "webiik/mail",
+  "type": "library",
+  "description": "The Mail component adds common interface above underlying mail classes, but it keeps accessible all their methods.",
+  "keywords": ["mail"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2"
+  },
+  "suggest": {
+    "phpmailer/phpmailer": "✉️",
+    "swiftmailer/swiftmailer": "✉️"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\Mail\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
