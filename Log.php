@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Webiik\Log;
 
+use Webiik\Container\Container;
 use Webiik\Log\Logger\LoggerInterface;
 
 class Log
@@ -17,7 +18,12 @@ class Log
     const DEBUG = 'debug';
 
     /**
-     * Log loggers we will use for logging
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * Loggers we will use for logging
      * @var array
      */
     private $loggers = [];
@@ -27,6 +33,14 @@ class Log
      * @var array
      */
     private $records = [];
+
+    /**
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * Logs with an arbitrary level in PSR-3 format
@@ -40,7 +54,7 @@ class Log
     public function log(string $level, string $message, array $context = [], array $data = []): void
     {
         if ($context) {
-            $message = $this->parse($message, $context);
+            $message = $this->parseContext($message, $context);
         }
 
         $this->records[] = new Record($level, $message, $data);
@@ -48,10 +62,10 @@ class Log
 
     /**
      * Add logger to appropriate log level(s)
-     * @param LoggerInterface $logger
+     * @param string $logger
      * @param array $levels
      */
-    public function addLogger(LoggerInterface $logger, array $levels = []): void
+    public function addLogger(string $logger, array $levels = []): void
     {
         if (!$levels) {
             $levels = [
@@ -86,8 +100,8 @@ class Log
                 }
             }
 
-            /* @var $logger LoggerInterface */
-            $logger = $arr[0];
+            /** @var LoggerInterface $logger */
+            $logger = $this->container->get($arr[0]);
             $logger->process($loggerRecords);
         }
 
@@ -99,13 +113,12 @@ class Log
      * @param array $context
      * @return string
      */
-    private function parse(string $message, array $context): string
+    private function parseContext(string $message, array $context): string
     {
         $replace = [];
         foreach ($context as $key => $val) {
             $replace['{' . $key . '}'] = $val;
         }
-        $message = strtr($message, $replace);
-        return $message;
+        return strtr($message, $replace);
     }
 }
