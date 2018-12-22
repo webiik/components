@@ -21,7 +21,7 @@ class Mail implements LoggerInterface
         $rows = '';
 
         foreach ($records as $record) {
-            /* @var $record Record */
+            /** @var Record $record */
             $rows = $rows . $this->parse($record);
         }
     }
