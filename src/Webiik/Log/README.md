@@ -1,5 +1,5 @@
 Log Component
-======================
+=============
 The Log component provides simple solution for advanced logging.
 
 Resources
