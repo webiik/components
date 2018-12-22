@@ -15,19 +15,19 @@ class ErrorLog implements LoggerInterface
 
     /**
      * @link http://php.net/manual/en/function.error-log.php
-     * @var
+     * @var int
      */
     private $messageType;
 
     /**
      * @link http://php.net/manual/en/function.error-log.php
-     * @var
+     * @var string
      */
     private $destination;
 
     /**
      * @link http://php.net/manual/en/function.error-log.php
-     * @var
+     * @var string
      */
     private $extraHeaders;
 
