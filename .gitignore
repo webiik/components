@@ -1,8 +1,9 @@
 .idea
 .DS_Store
+.scannerwork
 composer.lock
 vendor
-myreport
-test-index.php
-test.php
+analysis/*
+!analysis/analyse.sh
+/*.php
 *.log
