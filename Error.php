@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Webiik\Error;
 
-use Webiik\Log\Log;
+use Webiik\Container\Container;
 
 class Error
 {
     /**
-     * @var Log
+     * @var Container
      */
-    private $log;
+    private $container;
 
     /**
      * @var string
@@ -30,7 +30,7 @@ class Error
     /**
      * @var array
      */
-    private $silentIngoreErrors = [
+    private $silentIgnoreErrors = [
         'E_WARNING',
         'E_CORE_WARNING',
         'E_COMPILE_WARNING',
@@ -46,8 +46,10 @@ class Error
      */
     private $silentPageContent;
 
-    public function __construct()
+    public function __construct(Container $container)
     {
+        $this->container = $container;
+
         // Configure error reporting
         ini_set('log_errors', '0');
         ini_set('display_errors', '0');
@@ -60,32 +62,23 @@ class Error
     }
 
     /**
-     * Override default use of error_log by Log
-     * @param Log $log
-     */
-    public function setLog(Log $log): void
-    {
-        $this->log = $log;
-    }
-
-    /**
      * Set default log level of php errors when using Log
      * Will be used for all php errors without associated log level
-     * @param $level
+     * @param string $level
      */
-    public function setErrLogDefLevel($level): void
+    public function setErrLogDefLevel(string $level): void
     {
         $this->errToLogDefLevel = $level;
     }
 
     /**
      * Set log level of specific php error when using Log
-     * @param $error
-     * @param $level
+     * @param string $errorType
+     * @param string $level
      */
-    public function addErrLogLevel($error, $level): void
+    public function addErrLogLevel(string $errorType, string $level): void
     {
-        $this->errToLogLevel[$error] = [$level];
+        $this->errToLogLevel[$errorType] = [$level];
     }
 
     /**
@@ -114,7 +107,7 @@ class Error
      */
     public function setSilentIgnoreErrors(array $arr): void
     {
-        $this->silentIngoreErrors = $arr;
+        $this->silentIgnoreErrors = $arr;
     }
 
     /**
@@ -151,7 +144,7 @@ class Error
     private function exceptionHandler(): callable
     {
         /** @param \Error|\Exception $exception */
-        $exceptionHandler = function ($exception) {
+        return function ($exception) {
             $this->outputError(
                 'Exception',
                 $exception->getMessage(),
@@ -160,7 +153,6 @@ class Error
                 $this->getFormattedTrace($exception->getTrace())
             );
         };
-        return $exceptionHandler;
     }
 
     /**
@@ -169,7 +161,7 @@ class Error
      */
     private function errorHandler(): callable
     {
-        $errorHandler = function ($errno, $errstr, $errfile, $errline) {
+        return function ($errno, $errstr, $errfile, $errline) {
             if ($errno && error_reporting()) {
                 $this->outputError(
                     $this->getErrType($errno),
@@ -180,7 +172,6 @@ class Error
                 );
             }
         };
-        return $errorHandler;
     }
 
     /**
@@ -189,7 +180,7 @@ class Error
      */
     private function shutdownHandler(): callable
     {
-        $shutdownHandler = function () {
+        return function () {
             $err = error_get_last();
             if ($err && $err['type'] === E_ERROR) {
                 $this->outputError(
@@ -201,7 +192,6 @@ class Error
                 );
             }
         };
-        return $shutdownHandler;
     }
 
     /**
@@ -241,7 +231,7 @@ class Error
     {
         $this->logError($errType, $message, $file, $line, $trace);
 
-        if ($this->silent && !in_array($errType, $this->silentIngoreErrors)) {
+        if ($this->silent && !in_array($errType, $this->silentIgnoreErrors)) {
             echo $this->silentPageContent;
             exit;
         }
@@ -289,9 +279,9 @@ class Error
     {
         $msg = '[' . $errType . '] ' . $message . ' in ' . $file . ' on line ' . $line;
 
-        if ($this->log) {
-            // Note: log levels aren't php error types, log levels reflect PSR-3
+        // Note: log levels aren't php error types, log levels reflect PSR-3
 
+        if ($this->container->isIn('Webiik\Log\Log')) {
             // Set default log level
             $level = $this->errToLogDefLevel;
 
@@ -300,11 +290,9 @@ class Error
                 $level = $this->errToLogLevel[$errType];
             }
 
-            $this->log->log($level, $msg, [], $trace);
-            $this->log->write();
-        }
-
-        if (!$this->log) {
+            $this->container->get('Webiik\Log\Log')->log($level, $msg, [], $trace);
+            $this->container->get('Webiik\Log\Log')->write();
+        } else {
             error_log($msg);
         }
     }
