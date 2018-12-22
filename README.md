@@ -1,6 +1,6 @@
 Error Component
 ===============
-The Error component provides more control over managing PHP errors.
+The Error component provides more control over displaying and logging PHP errors.
 
 Resources
 ---------
