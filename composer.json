@@ -1,0 +1,26 @@
+{
+  "name": "webiik/container",
+  "type": "library",
+  "description": "The Container component adds control methods over Pimple core functions and then adds method for automatic constructor DI from container.",
+  "keywords": ["di", "dependency", "injection", "container"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "pimple/pimple": "^3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\Container\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
