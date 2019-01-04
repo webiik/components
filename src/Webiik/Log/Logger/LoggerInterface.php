@@ -7,7 +7,7 @@ interface LoggerInterface
 {
     /**
      * Process log record(s)
-     * @param array $records
+     * @param array $records Array of Record objects
      */
     public function process(array $records): void;
 }
