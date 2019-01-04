@@ -66,47 +66,75 @@ class Container extends \Pimple\Container
     }
 
     /**
-     * Inject dependencies from Container to $object using object constructor method
+     * Inject dependencies from Container to $object using the object constructor method
      * @param string $className
-     * @param Container $container
      * @return array
      * @throws \ReflectionException
      */
-    public static function inject(string $className, Container $container): array
+    public function injectTo(string $className): array
     {
-        return self::prepareMethodParameters($className, '__construct', $container);
+        return $this->prepareMethodParameters($className, '__construct');
+    }
+
+    /**
+     * Get an array with parameters described in method's doc comment
+     * @param \ReflectionMethod $reflection
+     * @return array
+     */
+    private function getDocBlockParams(\ReflectionMethod $reflection): array
+    {
+        $methodDocBlockParams = [];
+        $methodDocBlock = $reflection->getDocComment();
+        if ($methodDocBlock) {
+            preg_match_all('/@param\s([\w_\\-]+)?\s?\$([\w_\\-]+)/', $methodDocBlock, $matches);
+            foreach ($matches[1] as $index => $match) {
+                // arr['paramName'] = 'paramType'
+                $methodDocBlockParams[$matches[2][$index]] = $match;
+            }
+        }
+        return $methodDocBlockParams;
     }
 
     /**
      * @param string $className
      * @param string $methodName
-     * @param Container $container
      * @return array
      * @throws \ReflectionException
      */
-    private static function prepareMethodParameters(string $className, string $methodName, Container $container): array
+    private function prepareMethodParameters(string $className, string $methodName): array
     {
         $methodParamInstances = [];
-
         $reflection = new \ReflectionMethod($className, $methodName);
+
+        // Get an array with parameters described in method's doc comment
+        $methodDocBlockParams = $this->getDocBlockParams($reflection);
+
+        // Get instances of required parameters from container
         $methodParams = $reflection->getParameters();
         foreach ($methodParams as $methodParam) {
+            // Get service name
+            $serviceName = $methodParam->getName();
+
+            // Parameter is a class, use class name or doc block paramType as service name
             if ($methodParam->getClass()) {
-                // Parameter is a class
-                $methodParamName = $methodParam->getClass()->getName();
-            } else {
-                // Parameter is not a class
-                $methodParamName = $methodParam->getName();
+                $serviceName = $methodParam->getClass()->getName();
+
+                // If param type is described in method's doc block
+                // use as service name param type from doc block instead of class name.
+                // Also Prevent to update mismatched params, eg. param name
+                // is different in doc block than in method definition.
+                if (isset($methodDocBlockParams[$methodParam->getName()])) {
+                    // Update only params with paramType started with lower case 'ws'
+                    if (preg_match('/ws[A-Z]/', $methodDocBlockParams[$methodParam->getName()])) {
+                        $serviceName = $methodDocBlockParams[$methodParam->getName()];
+                    }
+                }
             }
 
-            if ($methodParam->isOptional()) {
-                if ($container->isIn($methodParamName)) {
-                    $methodParamInstances[] = $container->get($methodParamName);
-                } else {
-                    $methodParamInstances[] = $methodParam->getDefaultValue();
-                }
+            if ($methodParam->isDefaultValueAvailable()) {
+                $methodParamInstances[] = $methodParam->getDefaultValue();
             } else {
-                $methodParamInstances[] = $container->get($methodParamName);
+                $methodParamInstances[] = $this->get($serviceName);
             }
         }
 
