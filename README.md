@@ -2,7 +2,7 @@
 
 Webiik
 ======
-**[Webiik][1] is simplest php framework EVER.** Thanks to its tiny code base Webiik gives you the necessary control over code of your app. Webiik is so small that you can literally learn it until the last line of code.
+**[Webiik][1] is simplest PHP framework ever.** Thanks to its tiny code base Webiik gives you the necessary control over code of your app. Webiik is so small that you can literally learn it until the last line of code.
  
 | Framework | CC | LLOC | Classes | Dependencies | Req/s |
 | :------ | ----: | ------: | ----: | ---: | ---: |
