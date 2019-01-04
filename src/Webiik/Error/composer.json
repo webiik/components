@@ -13,10 +13,10 @@
   ],
   "require": {
     "php": ">=7.2",
-    "webiik/container": "^3"
   },
   "suggest": {
-    "webiik/log": "Enables errors logging."
+    "webiik/container": "Allows to add advanced error logging.",
+    "webiik/log": "Enables advanced error logging."
   },
   "autoload": {
     "psr-4": {
