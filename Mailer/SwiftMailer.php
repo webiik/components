@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Webiik\Mail\Mailer;
 
-use Webiik\Container\Container;
-use Webiik\Log\Log;
 use Webiik\Mail\Message;
 
 class SwiftMailer implements MailerInterface
@@ -15,283 +13,164 @@ class SwiftMailer implements MailerInterface
     private $mailer;
 
     /**
-     * @var Container
+     * @var \Swift_Message
      */
-    private $container;
+    private $swiftMessage;
 
     /**
      * @param \Swift_Mailer $mailer
-     * @param Container $container
      */
-    public function __construct(\Swift_Mailer $mailer, Container $container)
+    public function __construct(\Swift_Mailer $mailer)
     {
         $this->mailer = $mailer;
-        $this->container = $container;
     }
 
-    /**
-     * Send all messages
-     * @param array $messages
-     * @return mixed|void
-     */
-    public function send(array $messages)
-    {
-        foreach ($messages as $message) {
-            $swiftMessage = new \Swift_Message();
-            /** @var Message $message */
-            $swiftMessage = $this->setCharset($message, $swiftMessage);
-            $swiftMessage = $this->setPriority($message, $swiftMessage);
-            $swiftMessage = $this->setFrom($message, $swiftMessage);
-            $swiftMessage = $this->setReplyTo($message, $swiftMessage);
-            $swiftMessage = $this->setBounceAddress($message, $swiftMessage);
-            $swiftMessage = $this->addTo($message, $swiftMessage);
-            $swiftMessage = $this->addCc($message, $swiftMessage);
-            $swiftMessage = $this->addBcc($message, $swiftMessage);
-            $swiftMessage = $this->setSubject($message, $swiftMessage);
-            $swiftMessage = $this->setBody($message, $swiftMessage);
-            $swiftMessage = $this->setAlternativeBody($message, $swiftMessage);
-            $swiftMessage = $this->addDynamicAttachment($message, $swiftMessage);
-            $swiftMessage = $this->addFileAttachment($message, $swiftMessage);
-            $swiftMessage = $this->addDynamicEmbed($message, $swiftMessage);
-            $swiftMessage = $this->addFileEmbed($message, $swiftMessage);
-            $failedRecipients = [];
-            $this->mailer->send($swiftMessage, $failedRecipients);
-            if ($failedRecipients && $this->container->isIn('Webiik\Log\Log')) {
-                foreach ($failedRecipients as $failedRecipient) {
-                    $this->logError($failedRecipient, $message->getSubject());
-                }
-            }
-        }
-    }
-
-    /**
-     * @return \Swift_Mailer
-     */
     public function core(): \Swift_Mailer
     {
         return $this->mailer;
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setBody(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function send(array $messages): array
     {
-        $body = $message->getBody();
-        if ($body) {
-            $swiftMessage = $swiftMessage->setBody($body[0]);
-            $swiftMessage = $swiftMessage->setContentType($body[1]);
+        $undelivered = [];
+
+        foreach ($messages as $message) {
+            /** @var Message $message */
+
+            $this->swiftMessage = new \Swift_Message();
+
+            $this->setCharset($message->getCharset());
+            $this->setPriority($message->getPriority());
+            $this->setFrom(...$message->getFrom());
+            $this->setBounceAddress($message->getBounceAddress());
+
+            $this->addReplyToAddresses($message);
+            $this->addCCs($message);
+            $this->addBCCs($message);
+
+            $this->setSubject($message->getSubject());
+            $this->setBody(...$message->getBody());
+            $this->setAlternativeBody($message->getAlternativeBody());
+
+            $this->addDynamicAttachments($message);
+            $this->addFileAttachments($message);
+            $this->addDynamicEmbeds($message);
+            $this->addFileEmbeds($message);
+
+            foreach ($message->getTo() as $recipient) {
+                $this->addTo(...$recipient);
+            }
+
+            $failedRecipients = [];
+            $this->mailer->send($this->swiftMessage, $failedRecipients);
+
+            if ($failedRecipients) {
+                $undelivered = array_merge($undelivered, $failedRecipients);
+            }
         }
-        return $swiftMessage;
+
+        return $undelivered;
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setAlternativeBody(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function setCharset(string $string): void
     {
-        $body = $message->getAlternativeBody();
-        if ($body) {
-            $swiftMessage = $swiftMessage->addPart($body, 'plain/text');
-        }
-        return $swiftMessage;
+        $this->swiftMessage->setCharset($string);
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setCharset(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function setPriority(int $int): void
     {
-        return $swiftMessage->setCharset($message->getCharset());
+        $this->swiftMessage->setPriority($int);
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setPriority(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function setFrom(string $email, string $name = ''): void
     {
-        $priority = $message->getPriority();
-        if ($priority) {
-            $swiftMessage = $swiftMessage->setPriority($priority);
-        }
-        return $swiftMessage;
+        $this->swiftMessage->setFrom($email, $name);
     }
 
-    /**
-     * Set from email and name
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setFrom(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function setBounceAddress(string $email): void
     {
-        return $swiftMessage->setFrom(...$message->getFrom());
+        $this->swiftMessage->setReturnPath($email);
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setReplyTo(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function setSubject(string $subject): void
+    {
+        $this->swiftMessage->setSubject($subject);
+    }
+
+    public function setBody(string $string, $mime = 'text/html'): void
+    {
+        $this->swiftMessage->setBody($string);
+        $this->swiftMessage->setContentType($mime);
+    }
+
+    public function setAlternativeBody(string $string): void
+    {
+        $this->swiftMessage->addPart($string, 'plain/text');
+    }
+
+    public function addReplyToAddresses(Message $message): void
     {
         $recipients = [];
         foreach ($message->getReplyTo() as $recipient) {
             $recipients[] = $recipient[0];
         }
-        return $swiftMessage->setReplyTo($recipients);
+        $this->swiftMessage->setReplyTo($recipients);
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setBounceAddress(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function addTo(string $email, string $name = ''): void
     {
-        return $swiftMessage->setReturnPath($message->getBounceAddress());
+        $this->swiftMessage->addTo($email, $name);
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function setSubject(Message $message, \Swift_Message $swiftMessage): \Swift_Message
-    {
-        return $swiftMessage->setSubject($message->getSubject());
-    }
-
-    /**
-     * Add recipients
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function addTo(Message $message, \Swift_Message $swiftMessage): \Swift_Message
-    {
-        foreach ($message->getTo() as $recipient) {
-            $swiftMessage = $swiftMessage->addTo(...$recipient);
-        }
-        return $swiftMessage;
-    }
-
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function addCc(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function addCCs(Message $message): void
     {
         foreach ($message->getCc() as $recipient) {
-            $swiftMessage = $swiftMessage->addCc(...$recipient);
+            $this->swiftMessage->addCc(...$recipient);
         }
-        return $swiftMessage;
     }
 
-    /**
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function addBcc(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function addBCCs(Message $message): void
     {
         foreach ($message->getBcc() as $recipient) {
-            $swiftMessage = $swiftMessage->addBcc(...$recipient);
+            $this->swiftMessage->addBcc(...$recipient);
         }
-        return $swiftMessage;
     }
 
-    /**
-     * Attach dynamic content to message
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function addDynamicAttachment(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function addDynamicAttachments(Message $message): void
     {
         foreach ($message->getDynamicAttachments() as $attachment) {
-            $swiftAttachment = new \Swift_Attachment($attachment[0], $attachment[1], $attachment[2]);
-            $swiftMessage = $swiftMessage->attach($swiftAttachment);
+            $swiftAttachment = new \Swift_Attachment(...$attachment);
+            $this->swiftMessage->attach($swiftAttachment);
         }
-
-        return $swiftMessage;
     }
 
-    /**
-     * Attach files to message
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function addFileAttachment(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function addFileAttachments(Message $message): void
     {
         foreach ($message->getFileAttachments() as $attachment) {
-            $swiftAttachment = new \Swift_Attachment($attachment[0], $attachment[1], $attachment[2]);
-            $swiftMessage = $swiftMessage->attach($swiftAttachment);
+            $swiftAttachment = new \Swift_Attachment(...$attachment);
+            $this->swiftMessage->attach($swiftAttachment);
         }
-
-        return $swiftMessage;
     }
 
-    /**
-     * Embed dynamic content to message (usually images)
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function addDynamicEmbed(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function addDynamicEmbeds(Message $message): void
     {
         foreach ($message->getDynamicEmbeds() as $embed) {
             $swiftAttachment = new \Swift_Attachment($embed[0], $embed[2], $embed[3]);
             $swiftAttachment = $swiftAttachment
                 ->setDisposition('inline')
                 ->setId($embed[1]);
-            $swiftMessage = $swiftMessage->attach($swiftAttachment->setDisposition('inline'));
+            $this->swiftMessage->attach($swiftAttachment);
         }
-
-        return $swiftMessage;
     }
 
-    /**
-     * Embed files to message (usually images)
-     * @param Message $message
-     * @param \Swift_Message $swiftMessage
-     * @return \Swift_Message
-     */
-    private function addFileEmbed(Message $message, \Swift_Message $swiftMessage): \Swift_Message
+    public function addFileEmbeds(Message $message): void
     {
         foreach ($message->getFileEmbeds() as $embed) {
             $swiftAttachment = new \Swift_Attachment($embed[0], $embed[2], $embed[3]);
             $swiftAttachment = $swiftAttachment
                 ->setDisposition('inline')
                 ->setId($embed[1]);
-            $swiftMessage = $swiftMessage->attach($swiftAttachment->setDisposition('inline'));
+            $this->swiftMessage->attach($swiftAttachment);
         }
-
-        return $swiftMessage;
-    }
-
-    /**
-     * @param string $email
-     * @param string $subject
-     */
-    private function logError(string $email, string $subject): void
-    {
-        /** @var Log $log */
-        $log = $this->container->get('Webiik\Log\Log');
-        $logMsg = 'Unable to send "{subject}" to: {email}';
-        $log->log($log::NOTICE, $logMsg, [
-            'subject' => $subject,
-            'email' => $email,
-        ]);
     }
 }
