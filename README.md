@@ -1,17 +1,34 @@
+> **!!! NOTICE: Webiik is under development. Please don't use it. !!!**
+
 Webiik
 ======
-[Webiik][1] is full-pfelged **PHP framework focused on efficiency, simplicity and flexibility**. Thanks to its tiny code base Webiik brings you necessary control over code of your app.
+**[Webiik][1] is simplest php framework EVER.** Thanks to its tiny code base Webiik gives you the necessary control over code of your app. Webiik is so small that you can literally learn it until the last line of code.
  
-| Package | Complexity | Lines | Classes | Dependencies |
-| :------ | ----: | ------: | ----: | ---: 
-| [Webiik][2]  |     ? |       ? |     ? |    1 | 
-| [Nette][8] |  21.57 |  34 590 |   263 |   0 |
-| [Laravel][7] |  7.94 |  88 348 |   665 |   23 |
-| [Symfony][6] | 12.11 | 158 133 | 1 836 |   11 |
+| Framework | CC | LLOC | Classes | Dependencies | Req/s |
+| :------ | ----: | ------: | ----: | ---: | ---: |
+| [Webiik][2]  | ? | ? | ? | ? | ? | 
+| [Nette][8]   | ? | ? | ? | ? | ? |
+| [Laravel][7] | ? | ? | ? | ? | ? |
+| [Symfony][6] | ? | ? | ? | ? | ? |
+| [Codeigniter][9] | ? | ? | ? | ? | ? |
+| [CakePHP][10] | ? | ? | ? | ? | ? |
+| [Yii2][11] | ? | ? | ? | ? | ? |
+
+CC - cyclomatic complexity, LLOC - logical lines of code
+
+Why to choose Webiik
+--------------------
+Webiik is great for those looking for **simple, fully featured, flexible and efficient** framework. If you think frameworks are unnecessary overhead, you will love Webiik.
+* Pretty URLs
+* Authentication (roles, permanent, social)
+* Multilingual (routing, auth, translations...)
+* Simple to use dependency injection
+* VPS installation helper
+* ...and many more
 
 Documentation
 -------------
-Read straightforward [documentation][1] and master the Webiik within few days. Really it is so simple, you don't have to spend weeks reading the documentation and watching video tutorials.
+**Become the Webiik master within few days**, just read the straightforward [documentation][1].
 
 Contributing
 ------------
@@ -36,3 +53,6 @@ Webiik and all its components are provided under [MIT license][5].
 [6]: https://github.com/symfony/symfony
 [7]: https://github.com/laravel/framework
 [8]: https://github.com/nette/nette
+[9]: https://github.com/bcit-ci/CodeIgniter
+[10]: https://github.com/cakephp/cakephp
+[11]: https://github.com/yiisoft/yii2
