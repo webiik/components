@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Webiik\Error;
 
 use Webiik\Container\Container;
+use Webiik\Log\Log;
 
 class Error
 {
@@ -13,6 +14,12 @@ class Error
     private $container;
 
     /**
+     * Name of Webiik\Log in Container
+     * @var string
+     */
+    private $logServiceName = '';
+
+    /**
      * @var string
      */
     private $errToLogDefLevel = 'warning';
@@ -20,7 +27,10 @@ class Error
     /**
      * @var array
      */
-    private $errToLogLevel = [];
+    private $errToLogLevel = [
+        'Exception' => 'error',
+        'E_ERROR' => 'error',
+    ];
 
     /**
      * @var bool
@@ -44,12 +54,10 @@ class Error
     /**
      * @var string
      */
-    private $silentPageContent;
+    private $silentPageContent = '';
 
-    public function __construct(Container $container)
+    public function __construct()
     {
-        $this->container = $container;
-
         // Configure error reporting
         ini_set('log_errors', '0');
         ini_set('display_errors', '0');
@@ -59,6 +67,16 @@ class Error
         set_error_handler($this->errorHandler());
         register_shutdown_function($this->shutdownHandler());
         set_exception_handler($this->exceptionHandler());
+    }
+
+    /**
+     * @param string $name
+     * @param Container $container
+     */
+    public function setLogService(string $name, Container $container)
+    {
+        $this->logServiceName = $name;
+        $this->container = $container;
     }
 
     /**
@@ -73,12 +91,11 @@ class Error
 
     /**
      * Set log level of specific php error when using Log
-     * @param string $errorType
-     * @param string $level
+     * @param array $assocArr
      */
-    public function addErrLogLevel(string $errorType, string $level): void
+    public function setErrLogLevel(array $assocArr): void
     {
-        $this->errToLogLevel[$errorType] = [$level];
+        $this->errToLogLevel = $assocArr;
     }
 
     /**
@@ -183,12 +200,30 @@ class Error
         return function () {
             $err = error_get_last();
             if ($err && $err['type'] === E_ERROR) {
+                // Separate message
+                preg_match('/.+/', $err['message'], $match);
+                $msg = $match ? $match[0] : '';
+
+                // Separate backtrace
+                preg_match('/trace:(.+)/s', $err['message'], $match);
+                if (isset($match[1]) && $match[1]) {
+                    $trace = preg_split('/\s#\d+/', $match[1]);
+                    unset($trace[0]);
+                    $traceIndex = count($trace);
+                    foreach ($trace as $key => $traceLine) {
+                        $trace[$key] = '#' . $traceIndex . ' ' . $traceLine;
+                        $traceIndex--;
+                    }
+                } else {
+                    $trace = $this->getFormattedTrace(debug_backtrace());
+                }
+
                 $this->outputError(
                     $this->getErrType($err['type']),
-                    $err['message'],
+                    $msg,
                     $err['file'],
                     $err['line'],
-                    $this->getFormattedTrace(debug_backtrace())
+                    $trace
                 );
             }
         };
@@ -226,18 +261,25 @@ class Error
      * @param string $file
      * @param int $line
      * @param array $trace
+     * @throws \Exception
      */
     private function outputError(string $errType, string $message, string $file, int $line, array $trace): void
     {
-        $this->logError($errType, $message, $file, $line, $trace);
+        $exit = false;
 
         if ($this->silent && !in_array($errType, $this->silentIgnoreErrors)) {
             echo $this->silentPageContent;
-            exit;
+            $exit = true;
         }
 
         if (!$this->silent) {
             echo $this->htmlError($errType, $message, $file, $line, $trace);
+            $exit = true;
+        }
+
+        $this->logError($errType, $message, $file, $line, $trace);
+
+        if ($exit) {
             exit;
         }
     }
@@ -267,6 +309,7 @@ class Error
         return $html;
     }
 
+
     /**
      * Log error using the error_log or Log
      * @param string $errType
@@ -274,6 +317,7 @@ class Error
      * @param string $file
      * @param int $line
      * @param array $trace
+     * @throws \Exception
      */
     private function logError(string $errType, string $message, string $file, int $line, array $trace): void
     {
@@ -281,7 +325,7 @@ class Error
 
         // Note: log levels aren't php error types, log levels reflect PSR-3
 
-        if ($this->container->isIn('Webiik\Log\Log')) {
+        if ($this->container !== null) {
             // Set default log level
             $level = $this->errToLogDefLevel;
 
@@ -290,8 +334,20 @@ class Error
                 $level = $this->errToLogLevel[$errType];
             }
 
-            $this->container->get('Webiik\Log\Log')->log($level, $msg, [], $trace);
-            $this->container->get('Webiik\Log\Log')->write();
+            // Prepare additional data to log
+            $data = [
+                'error type' => $errType,
+                'file' => $file,
+                'line' => $line,
+                'error message' => $message,
+                'trace' => $trace,
+            ];
+
+            // Add and write error log
+            /** @var Log $log */
+            $log = $this->container->get($this->logServiceName);
+            $log->log($level, $msg, [], $data);
+            $log->write();
         } else {
             error_log($msg);
         }
