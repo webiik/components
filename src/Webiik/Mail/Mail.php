@@ -38,9 +38,9 @@ class Mail
     /**
      * Send messages
      * @param array $messages
-     * @return mixed
+     * @return array Array of undelivered addresses.
      */
-    public function send(array $messages)
+    public function send(array $messages): array
     {
         return $this->container->get($this->mailer)->send($messages);
     }
