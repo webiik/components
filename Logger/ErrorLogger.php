@@ -5,7 +5,7 @@ namespace Webiik\Log\Logger;
 
 use Webiik\Log\Record;
 
-class ErrorLog implements LoggerInterface
+class ErrorLogger implements LoggerInterface
 {
     /**
      * Default message format
@@ -40,7 +40,7 @@ class ErrorLog implements LoggerInterface
 
         foreach ($records as $record) {
             /* @var $record Record */
-            $rows = $rows . $this->parse($record);
+            $rows .= $this->parse($record);
         }
 
         if (!$this->messageType) {
