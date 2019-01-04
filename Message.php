@@ -56,9 +56,9 @@ class Message
     private $charset = 'utf-8';
 
     /**
-     * @var
+     * @var int
      */
-    private $priority;
+    private $priority = 3;
 
     /**
      * @var array
@@ -107,6 +107,7 @@ class Message
     }
 
     /**
+     * Set return address of undeliverable message
      * @param string $email
      */
     public function setBounceAddress(string $email): void
@@ -123,6 +124,7 @@ class Message
     }
 
     /**
+     * Set message body
      * @param string $string
      * @param string $mime - usually text/html or text/plain
      */
@@ -132,6 +134,8 @@ class Message
     }
 
     /**
+     * Set alternative message body
+     * Alternative body MUST be in text/plain
      * @param string $string
      */
     public function setAlternativeBody(string $string): void
@@ -140,6 +144,7 @@ class Message
     }
 
     /**
+     * Add recipient
      * @param string $email
      * @param string $name
      */
@@ -176,6 +181,7 @@ class Message
     }
 
     /**
+     * Add on the fly generated content as attachment
      * @param string $string
      * @param string $filename
      * @param string $mime
@@ -202,6 +208,7 @@ class Message
     }
 
     /**
+     * Embed on the fly generated content to body of message
      * @param string $string
      * @param string $cid
      * @param string $filename
@@ -217,6 +224,7 @@ class Message
     }
 
     /**
+     * Embed file to body of message (usually image)
      * @param string $path
      * @param string $cid
      * @param string $filename
@@ -240,7 +248,7 @@ class Message
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getPriority()
     {
