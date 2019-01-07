@@ -138,8 +138,8 @@ class MailLogger implements LoggerInterface
     {
         // Encode subject and message
         $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-        $message = base64_encode(iconv(
-            mb_detect_encoding($message, mb_detect_order(), true),
+        $message = base64_encode((string)iconv(
+            (string)mb_detect_encoding($message, mb_detect_order(), true),
             'UTF-8',
             $message
         ));
@@ -163,13 +163,10 @@ class MailLogger implements LoggerInterface
      */
     private function prepareHtmlMessage(Message $message): array
     {
-        /** @var Message $message */
-        $htmlMessage = [
+        return [
             'html' => $this->getHtmlMessage($message),
             'hash' => $this->getHtmlMessageHash($message),
         ];
-
-        return $htmlMessage;
     }
 
     /**

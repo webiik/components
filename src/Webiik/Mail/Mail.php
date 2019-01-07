@@ -6,7 +6,7 @@ namespace Webiik\Mail;
 class Mail
 {
     /**
-     * @var string
+     * @var callable
      */
     private $mailer;
 
