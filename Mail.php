@@ -3,27 +3,12 @@ declare(strict_types=1);
 
 namespace Webiik\Mail;
 
-use Webiik\Container\Container;
-
 class Mail
 {
-    /**
-     * @var Container
-     */
-    private $container;
-
     /**
      * @var string
      */
     private $mailer;
-
-    /**
-     * @param Container $container
-     */
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
 
     /**
      * Create message which can be send
@@ -42,17 +27,18 @@ class Mail
      */
     public function send(array $messages): array
     {
-        return $this->container->get($this->mailer)->send($messages);
+        $mailer = $this->mailer;
+        return $mailer()->send($messages);
     }
 
     /**
-     * Set mailer service from Container eg. PHPMailer
+     * Set mailer service factory
      * Note: Mailer service has to implement MailerInterface
-     * @param string $mailer
+     * @param callable $factory
      */
-    public function setMailer(string $mailer):void
+    public function setMailer(callable $factory):void
     {
-        $this->mailer = $mailer;
+        $this->mailer = $factory;
     }
 
     /**
@@ -61,6 +47,7 @@ class Mail
      */
     public function getMailerCore()
     {
-        return $this->container->get($this->mailer)->core();
+        $mailer = $this->mailer;
+        return $mailer()->core();
     }
 }
