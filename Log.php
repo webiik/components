@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 namespace Webiik\Log;
 
-use Webiik\Container\Container;
-use Webiik\Log\Logger\LoggerInterface;
-
 class Log
 {
     const EMERGENCY = 'emergency';
@@ -18,36 +15,24 @@ class Log
     const DEBUG = 'debug';
 
     /**
-     * In silent mode unavailable loggers not throw exceptions
-     * instead of it these exceptions are logged with available loggers.
-     * @var bool
-     */
-    private $silent = false;
-
-    /**
-     * @var Container
-     */
-    private $container;
-
-    /**
      * Loggers we will use for logging
      * @var array
      */
     private $loggers = [];
 
     /**
-     * Records we will log
+     * Messages we will log
      * @var array
      */
-    private $records = [];
+    private $messages = [];
 
     /**
-     * @param Container $container
+     * In silent mode failed loggers not throw exceptions
+     * instead of it these exceptions are logged with other loggers.
+     * and failed loggers are skipped.
+     * @var bool
      */
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
+    private $silent = false;
 
     /**
      * @param bool $silent
@@ -57,120 +42,303 @@ class Log
         $this->silent = $silent;
     }
 
-
     /**
-     * Todo: Implement groups
+     * System is unusable
+     *
      * @param string $message
      * @param array $context
-     * @param array $data
-     * @param string $group
+     * @return Message
      */
-    public function info(string $message, array $context = [], array $data = [], string $group = ''): void
+    public function emergency(string $message, array $context = []): Message
     {
-    }
-
-    // Todo: Add another PSR-3 log level methods
-
-    /**
-     * Add logger with appropriate log level(s)
-     * @param string $logger
-     * @param array $levels
-     */
-    public function addLogger(string $logger, array $levels = []): void
-    {
-        if (!$levels) {
-            $levels = [
-                self::EMERGENCY,
-                self::ALERT,
-                self::CRITICAL,
-                self::ERROR,
-                self::WARNING,
-                self::NOTICE,
-                self::INFO,
-                self::DEBUG,
-            ];
-        }
-
-        $this->loggers[$logger] = $levels;
+        return $this->log(self::EMERGENCY, $message, $context);
     }
 
     /**
-     * Logs with an arbitrary level in PSR-3 format
+     * Action must be taken immediately
+     *
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string $message
+     * @param array $context
+     * @return Message
+     */
+    public function alert(string $message, array $context = []): Message
+    {
+        return $this->log(self::ALERT, $message, $context);
+    }
+
+    /**
+     * Critical conditions
+     *
+     * Example: Application component unavailable, unexpected exception.
+     *
+     * @param string $message
+     * @param array $context
+     * @return Message
+     */
+    public function critical(string $message, array $context = []): Message
+    {
+        return $this->log(self::CRITICAL, $message, $context);
+    }
+
+    /**
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
+     *
+     * @param string $message
+     * @param array $context
+     * @return Message
+     */
+    public function error(string $message, array $context = []): Message
+    {
+        return $this->log(self::ERROR, $message, $context);
+    }
+
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string $message
+     * @param array $context
+     * @return Message
+     */
+    public function warning(string $message, array $context = []): Message
+    {
+        return $this->log(self::WARNING, $message, $context);
+    }
+
+    /**
+     * Normal but significant events
+     *
+     * @param string $message
+     * @param array $context
+     * @return Message
+     */
+    public function notice(string $message, array $context = []): Message
+    {
+        return $this->log(self::NOTICE, $message, $context);
+    }
+
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs
+     *
+     * @param string $message
+     * @param array $context
+     * @return Message
+     */
+    public function info(string $message, array $context = []): Message
+    {
+        return $this->log(self::INFO, $message, $context);
+    }
+
+    /**
+     * Detailed debug information
+     *
+     * @param string $message
+     * @param array $context
+     * @return Message
+     */
+    public function debug(string $message, array $context = []): Message
+    {
+        return $this->log(self::DEBUG, $message, $context);
+    }
+
+    /**
+     * Create and store LogMessage
+     *
      * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md#5-psrlogloglevel
      *
-     * @param string $level PSR-3 log level
+     * @param string $level
      * @param string $message
      * @param array $context
-     * @param array $data
+     * @return Message
      */
-    private function log(string $level, string $message, array $context = [], array $data = []): void
+    public function log(string $level, string $message, array $context = []): Message
     {
         if ($context) {
             $message = $this->parseContext($message, $context);
         }
 
-        $this->records[] = new Record($level, $message, $data);
+        $logMessage = new Message($level);
+        $logMessage->setMessage($message);
+
+        $this->messages[] = $logMessage;
+
+        return $logMessage;
+    }
+
+    /**
+     * Create Logger with factory of underlying logger service
+     * @param callable $factory
+     * @return Logger
+     */
+    public function addLogger(callable $factory): Logger
+    {
+        $factory = new Logger($factory);
+        $this->loggers[] = $factory;
+        return $factory;
     }
 
     /**
      * Remove logger
-     * @param string $logger
+     * @param int $index
      */
-    private function delLogger(string $logger): void
+    private function delLogger(int $index): void
     {
-        unset($this->loggers[$logger]);
+        unset($this->loggers[$index]);
     }
 
-
     /**
-     * Write log records using the registered loggers and remove all records
+     * Write log records using the registered loggers and then remove all records
      * @throws \Exception
      */
     public function write(): void
     {
         $catchedExceptions = [];
+        $loggerInstances = [];
 
-        foreach ($this->loggers as $loggerName => $loggerLogLevels) {
-            // Prepare only records associated with log level(s) of iterated logger
-            $loggerRecords = [];
-            foreach ($this->records as $record) {
-                /* @var $record Record */
-                $recordLogLevel = $record->getLevel();
-                foreach ($loggerLogLevels as $loggerLogLevel) {
-                    if ($loggerLogLevel == $recordLogLevel) {
-                        $loggerRecords[] = $record;
+        foreach ($this->messages as $message) {
+            /* @var $message Message */
+            $messageLevel = $message->getLevel();
+            $messageGroups = $message->getGroups();
+
+            foreach ($this->loggers as $loggerIndex => $logger) {
+                /** @var Logger $logger */
+
+                // When logger has level(s) set, it has to log only messages belonging to same level(s)
+                $levelMatch = $this->levelMatch($messageLevel, $logger->getLevels());
+
+                // When logger belongs in group(s), it has to log only messages belonging to same group(s)
+                $groupMatch = $this->groupMatch($messageGroups, $logger->getGroups());
+
+                // When logger belongs in negative group(s), don't log message in same group
+                $negativeGroupMatch = $this->negativeGroupMatch($messageGroups, $logger->getNegativeGroups());
+
+                if ($levelMatch && $groupMatch && !$negativeGroupMatch) {
+                    // Log this message with this logger
+                    try {
+                        // Safe resources and instantiate each logger only once per write
+                        if (isset($loggerInstances[$loggerIndex])) {
+                            $loggerInstance = $loggerInstances[$loggerIndex];
+                        } else {
+                            $loggerInstance = $logger->createInstance();
+                            $loggerInstances[] = $loggerInstance;
+                        }
+                        $loggerInstance->write($message);
+                    } catch (\Exception $exception) {
+                        // When logger throws an exception, remove it from loggers
+                        // and then log the exception. It is necessary for safe
+                        // and uninterrupted logging.
+                        $this->delLogger($loggerIndex);
+                        $catchedExceptions[] = $exception;
+                    } catch (\TypeError $exception) {
+                        $this->delLogger($loggerIndex);
+                        $catchedExceptions[] = $exception;
+                    } catch (\Throwable $exception) {
+                        $this->delLogger($loggerIndex);
+                        $catchedExceptions[] = $exception;
                     }
                 }
             }
+        }
 
-            // Process records
-            if ($loggerRecords) {
-                try {
-                    /** @var LoggerInterface $logger */
-                    $logger = $this->container->get($loggerName);
-                    $logger->process($loggerRecords);
-                } catch (\Exception $exception) {
-                    // When logger doesn't exist remove it from loggers and log exception.
-                    // This is necessary for safe and uninterrupted logging.
-                    $this->delLogger($loggerName);
-                    $catchedExceptions[] = $exception;
-                } catch (\TypeError $exception) {
-                    $this->delLogger($loggerName);
-                    $catchedExceptions[] = $exception;
-                }
+        // Clear all written Messages
+        $this->clearLogs();
+
+        // Remove logger instances from memory
+        unset($loggerInstances);
+
+        if ($this->silent) {
+            // Log exceptions from failed loggers
+            $this->logExceptions($catchedExceptions);
+        } else {
+            // Throw exception from first failed logger
+            $this->throwExceptions($catchedExceptions);
+        }
+    }
+
+    /**
+     * Determine if message level matches logger level
+     * @param string $messageLevel
+     * @param array $loggerLevels
+     * @return bool
+     */
+    private function levelMatch(string $messageLevel, array $loggerLevels): bool
+    {
+        $levelMatch = false;
+
+        if (!$loggerLevels) {
+            // Logger has not specified level, it can log every message level
+            $levelMatch = true;
+        }
+
+        if (in_array($messageLevel, $loggerLevels)) {
+            // Logger belong to specified levels, test if message too
+            $levelMatch = true;
+        }
+
+        return $levelMatch;
+    }
+
+    /**
+     * Determine if message group matches logger group
+     * @param array $messageGroups
+     * @param array $loggerGroups
+     * @return bool
+     */
+    private function groupMatch(array $messageGroups, array $loggerGroups): bool
+    {
+        $groupMatch = false;
+
+        if (!$loggerGroups) {
+            // Logger doesn't belong to any group, it can log every message group
+            $groupMatch = true;
+        }
+
+        foreach ($loggerGroups as $loggerGroup) {
+            // Logger belongs to specified groups, test if message too
+            if (in_array($loggerGroup, $messageGroups)) {
+                $groupMatch = true;
+                break;
             }
         }
 
-        // Clear all written records
-        $this->records = [];
+        return $groupMatch;
+    }
 
-        if ($this->silent) {
-            // Log exceptions about non existing loggers
-            $this->logExceptions($catchedExceptions);
-        } else {
-            // Throw exception from first non existing logger
-            $this->throwExceptions($catchedExceptions);
+    /**
+     * Determine if message group matches negative logger group
+     * @param $messageGroups
+     * @param $loggerNegativeGroups
+     * @return bool
+     */
+    private function negativeGroupMatch($messageGroups, $loggerNegativeGroups): bool
+    {
+        $groupMatch = false;
+
+        foreach ($loggerNegativeGroups as $loggerNegativeGroup) {
+            // Logger belongs to specified groups, test if message too
+            if (in_array($loggerNegativeGroup, $messageGroups)) {
+                $groupMatch = true;
+                break;
+            }
         }
+
+        return $groupMatch;
+    }
+
+    /**
+     * Clear all stored Messages
+     */
+    private function clearLogs(): void
+    {
+        $this->messages = [];
     }
 
     /**
@@ -183,9 +351,15 @@ class Log
         if ($exceptions) {
             foreach ($exceptions as $exception) {
                 /** @var \Exception $exception */
-                $msg = '[Exception] ' . $exception->getMessage() . ' in ' . $exception->getFile();
-                $msg .= ' on line ' . $exception->getLine();
-                $this->log(self::WARNING, $msg, [], $exception->getTrace());
+                $msg = '[Exception] {message} in {file} on line {line}.';
+                $context = [
+                    'message' => $exception->getMessage(),
+                    'file' => $exception->getFile(),
+                    'line' => $exception->getLine(),
+                ];
+                $this->warning($msg, $context)
+                    ->setData($exception->getTrace())
+                    ->setGroup('error');
             }
             $this->write();
         }
@@ -213,6 +387,7 @@ class Log
     {
         $replace = [];
         foreach ($context as $key => $val) {
+            $val = is_numeric($val) ? $val : htmlspecialchars($val);
             $replace['{' . $key . '}'] = $val;
         }
         return strtr($message, $replace);
