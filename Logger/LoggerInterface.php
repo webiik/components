@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace Webiik\Log\Logger;
 
+use Webiik\Log\Message;
+
 interface LoggerInterface
 {
     /**
-     * Process log record(s)
-     * @param array $records Array of Record objects
+     * Process Message
+     * @param Message $message
      */
-    public function process(array $records): void;
+    public function write(Message $message): void;
 }

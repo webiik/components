@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Webiik\Log\Logger;
 
-use Webiik\Log\Record;
+use Webiik\Log\Message;
 
 class ErrorLogger implements LoggerInterface
 {
@@ -32,27 +32,22 @@ class ErrorLogger implements LoggerInterface
     private $extraHeaders;
 
     /**
-     * @param array $records
+     * @param Message $message
      */
-    public function process(array $records): void
+    public function write(Message $message): void
     {
-        $rows = '';
-
-        foreach ($records as $record) {
-            /* @var $record Record */
-            $rows .= $this->parse($record);
-        }
+        $row = $this->parse($message);
 
         if (!$this->messageType) {
-            error_log($rows);
+            error_log($row);
         } elseif ($this->messageType == 1) {
-            error_log($rows, $this->messageType, $this->destination);
+            error_log($row, $this->messageType, $this->destination);
         } elseif ($this->messageType == 3 && !$this->extraHeaders) {
-            error_log($rows, $this->messageType, $this->destination);
+            error_log($row, $this->messageType, $this->destination);
         } elseif ($this->messageType == 3 && $this->extraHeaders) {
-            error_log($rows, $this->messageType, $this->destination, $this->extraHeaders);
+            error_log($row, $this->messageType, $this->destination, $this->extraHeaders);
         } elseif ($this->messageType == 4) {
-            error_log($rows, $this->messageType);
+            error_log($row, $this->messageType);
         }
     }
 
@@ -90,16 +85,16 @@ class ErrorLogger implements LoggerInterface
 
     /**
      * Parse message by message format
-     * @param Record $record
+     * @param Message $message
      * @return string
      */
-    private function parse(Record $record): string
+    private function parse(Message $message): string
     {
         return strtr($this->messageFormat, [
-            '{date}' => date('Y/m/d', $record->getTime()),
-            '{time}' => date('H:i:s', $record->getTime()),
-            '{level}' => $record->getLevel(),
-            '{message}' => $record->getMessage(),
+            '{date}' => date('Y/m/d', $message->getTime()),
+            '{time}' => date('H:i:s', $message->getTime()),
+            '{level}' => $message->getLevel(),
+            '{message}' => $message->getMessage(),
         ]);
     }
 }

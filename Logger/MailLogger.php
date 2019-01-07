@@ -3,23 +3,20 @@ declare(strict_types=1);
 
 namespace Webiik\Log\Logger;
 
-use mysql_xdevapi\Exception;
-use Webiik\Container\Container;
-use Webiik\Log\Record;
-use Webiik\Mail\Mail;
+use Webiik\Log\Message;
 
 class MailLogger implements LoggerInterface
 {
     /**
-     * @var Container
+     * Factory of underlying mail service
+     * If no factory is set, PHP's mail function will be used instead
+     *
+     * Factory is injected with the following parameters:
+     * string $to, string $from, string $subject, string $message
+     *
+     * @var callable
      */
-    private $container;
-
-    /**
-     * Name of Webiik\Mail in Container
-     * @var string
-     */
-    private $mailServiceName = '';
+    private $mailService;
 
     /**
      * Delay in minutes between sending the same log message
@@ -53,13 +50,12 @@ class MailLogger implements LoggerInterface
     private $senderAddress = '';
 
     /**
-     * @param string $mailServiceName
-     * @param Container $container
+     * Set custom mail service using the factory
+     * @param callable $factory
      */
-    public function setMailService(string $mailServiceName, Container $container): void
+    public function setMailService(callable $factory): void
     {
-        $this->mailServiceName = $mailServiceName;
-        $this->container = $container;
+        $this->mailService = $factory;
     }
 
     /**
@@ -103,103 +99,112 @@ class MailLogger implements LoggerInterface
     }
 
     /**
-     * @param array $records
+     * @param Message $message
      */
-    public function process(array $records): void
+    public function write(Message $message): void
     {
-        $this->send($this->prepareHtmlMessages($records));
-    }
+        $htmlMessage = $this->prepareHtmlMessage($message);
 
-    /**
-     * Send log messages by email
-     * @param array $htmlMessages
-     */
-    private function send(array $htmlMessages): void
-    {
-        /** @var Mail $mail */
-        $mail = $this->container->get($this->mailServiceName);
-
-        // Prepare log messages to send
-        $messages = [];
-        foreach ($htmlMessages as $htmlMessageArr) {
-            // Skip messages that has been already sent and are still not expired
-            if ($htmlMessageArr[1]) {
-                $file = $this->tmpDir . '/' . $htmlMessageArr[1] . '.log';
-                $fileExpirationTs = time() - ($this->sendDelay * 60);
-                $fileLastModifiedTs = @filemtime($file);
-                if ($fileLastModifiedTs && $fileLastModifiedTs > $fileExpirationTs) {
-                    continue;
-                }
-                file_put_contents($file, '');
+        // Don't send message that has been already sent or is still not expired
+        if ($this->sendDelay) {
+            $file = $this->tmpDir . '/' . $htmlMessage['hash'] . '.log';
+            $fileExpirationTs = time() - ($this->sendDelay * 60);
+            $fileLastModifiedTs = @filemtime($file);
+            if ($fileLastModifiedTs && $fileLastModifiedTs > $fileExpirationTs) {
+                return;
             }
-
-            // Prepare message with log to send
-            $message = $mail->createMessage();
-            $message->setSubject($this->subject);
-            $message->setFrom($this->senderAddress);
-            $message->addTo($this->recipientAddress);
-            $message->setBody($htmlMessageArr[0]);
-            $messages[] = $message;
+            file_put_contents($file, '');
         }
 
-        $mail->send($messages);
+        // Send message...
+        $mail = $this->mailService;
+        if ($mail === null) {
+            // ...using the PHP's mail function
+            $this->send($this->recipientAddress, $this->senderAddress, $this->subject, $htmlMessage['html']);
+        } else {
+            // ...using the user defined mail service
+            $mail($this->recipientAddress, $this->senderAddress, $this->subject, $htmlMessage['html']);
+        }
     }
 
     /**
-     * @param array $records
+     * Send HTML email in utf-8 and base64 encoding using the built-in PHP mail function
+     * @param string $from
+     * @param string $to
+     * @param string $subject
+     * @param string $message
+     */
+    private function send(string $from, string $to, string $subject, string $message): void
+    {
+        // Encode subject and message
+        $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
+        $message = base64_encode(iconv(
+            mb_detect_encoding($message, mb_detect_order(), true),
+            'UTF-8',
+            $message
+        ));
+
+        // Email header settings
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-Type: text/html; charset=utf-8',
+            'Content-Transfer-Encoding: base64',
+            'From: ' . $from,
+            'X-Mailer: PHP/' . phpversion()
+        ];
+
+        // Send message
+        mail($to, $subject, $message, implode("\r\n", $headers));
+    }
+
+    /**
+     * @param Message $message
      * @return array
      */
-    private function prepareHtmlMessages(array $records): array
+    private function prepareHtmlMessage(Message $message): array
     {
-        $htmlMessages = [];
+        /** @var Message $message */
+        $htmlMessage = [
+            'html' => $this->getHtmlMessage($message),
+            'hash' => $this->getHtmlMessageHash($message),
+        ];
 
-        foreach ($records as $record) {
-            /** @var Record $record */
-            $htmlMessages[] = [
-                $this->getHtmlMessage($record),
-                $this->getHtmlMessageHash($record),
-            ];
-        }
-
-        return $htmlMessages;
+        return $htmlMessage;
     }
 
     /**
      * Return formatted error to html
-     * @param Record $record
+     * @param Message $message
      * @return string
      */
-    private function getHtmlMessage(Record $record): string
+    private function getHtmlMessage(Message $message): string
     {
         $html = '<b>Log Level</b><br/>';
-        $html .= $record->getLevel() . '<br/><br/>';
+        $html .= $message->getLevel() . '<br/><br/>';
 
         $html .= '<b>Date</b><br/>';
-        $html .= date('Y/m/d H:i:s', $record->getTime()) . ' (' . $record->getTime() . ')<br/><br/>';
+        $html .= date('Y/m/d H:i:s', $message->getTime()) . ' (' . $message->getTime() . ')<br/><br/>';
 
         $html .= '<b>Message</b><br/>';
-        $html .= $record->getMessage() . '<br/><br/>';
+        $html .= $message->getMessage() . '<br/><br/>';
 
-        $data = $record->getData();
+        $data = $message->getData();
         if ($data) {
             $html .= '<hr/>';
-            $html .= $this->arrayToHtml($record->getData());
+            $html .= $this->arrayToHtml($message->getData());
         }
 
         return $html;
     }
 
     /**
-     * @param Record $record
+     * @param Message $message
      * @return string
      */
-    private function getHtmlMessageHash(Record $record): string
+    private function getHtmlMessageHash(Message $message): string
     {
-        $data = '';
-        if ($this->sendDelay && $record->getData()) {
-            $data = md5(json_encode($record->getData()));
-        }
-        return md5($record->getMessage() . $record->getLevel() . $data);
+        $data = json_encode($message->getData());
+        return md5($message->getMessage() . $message->getLevel() . $data);
     }
 
     /**
