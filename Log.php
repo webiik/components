@@ -314,11 +314,11 @@ class Log
 
     /**
      * Determine if message group matches negative logger group
-     * @param $messageGroups
-     * @param $loggerNegativeGroups
+     * @param array $messageGroups
+     * @param array $loggerNegativeGroups
      * @return bool
      */
-    private function negativeGroupMatch($messageGroups, $loggerNegativeGroups): bool
+    private function negativeGroupMatch(array $messageGroups, array $loggerNegativeGroups): bool
     {
         $groupMatch = false;
 
