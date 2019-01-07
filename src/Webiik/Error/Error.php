@@ -3,21 +3,18 @@ declare(strict_types=1);
 
 namespace Webiik\Error;
 
-use Webiik\Container\Container;
-use Webiik\Log\Log;
-
 class Error
 {
     /**
-     * @var Container
+     * Factory of underlying log service
+     * If no factory is set, PHP's error_log function will be used instead
+     *
+     * Factory is injected with the following parameters:
+     * string $level, string $message, array $data
+     *
+     * @var callable
      */
-    private $container;
-
-    /**
-     * Name of Webiik\Log in Container
-     * @var string
-     */
-    private $logServiceName = '';
+    private $logService;
 
     /**
      * @var string
@@ -38,13 +35,11 @@ class Error
     private $silent = false;
 
     /**
+     * The following error types will not halt the app in silent mode
+     * @link http://php.net/manual/en/errorfunc.constants.php
      * @var array
      */
     private $silentIgnoreErrors = [
-        'E_WARNING',
-        'E_CORE_WARNING',
-        'E_COMPILE_WARNING',
-        'E_USER_WARNING',
         'E_NOTICE',
         'E_USER_NOTICE',
         'E_DEPRECATED',
@@ -70,13 +65,11 @@ class Error
     }
 
     /**
-     * @param string $name
-     * @param Container $container
+     * @param callable $factory
      */
-    public function setLogService(string $name, Container $container)
+    public function setLogService(callable $factory)
     {
-        $this->logServiceName = $name;
-        $this->container = $container;
+        $this->logService = $factory;
     }
 
     /**
@@ -119,7 +112,6 @@ class Error
 
     /**
      * Set which error types will not halt the app in silent mode
-     * @link http://php.net/manual/en/errorfunc.constants.php
      * @param array $arr
      */
     public function setSilentIgnoreErrors(array $arr): void
@@ -325,7 +317,9 @@ class Error
 
         // Note: log levels aren't php error types, log levels reflect PSR-3
 
-        if ($this->container !== null) {
+        if ($this->logService === null) {
+            error_log($msg);
+        } else {
             // Set default log level
             $level = $this->errToLogDefLevel;
 
@@ -344,12 +338,8 @@ class Error
             ];
 
             // Add and write error log
-            /** @var Log $log */
-            $log = $this->container->get($this->logServiceName);
-            $log->log($level, $msg, [], $data);
-            $log->write();
-        } else {
-            error_log($msg);
+            $logService = $this->logService;
+            $logService($level, $msg, $data);
         }
     }
 }
