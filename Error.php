@@ -200,6 +200,7 @@ class Error
                 preg_match('/trace:(.+)/s', $err['message'], $match);
                 if (isset($match[1]) && $match[1]) {
                     $trace = preg_split('/\s#\d+/', $match[1]);
+                    $trace = is_array($trace) ? $trace : [];
                     unset($trace[0]);
                     $traceIndex = count($trace);
                     foreach ($trace as $key => $traceLine) {
