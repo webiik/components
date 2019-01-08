@@ -8,11 +8,11 @@ class Container extends \Pimple\Container
     /**
      * Add service to container
      * @param string $name
-     * @param callable $callable
+     * @param callable $factory
      */
-    public function addService(string $name, callable $callable): void
+    public function addService(string $name, callable $factory): void
     {
-        $this[$name] = $callable;
+        $this[$name] = $factory;
     }
 
     /**
