@@ -1,80 +1,163 @@
-Container Component
-===================
-The Container component adds handy methods to most common Pimple functions and then adds method for automatic injection of dependencies from container.
+<p align="left">
+<img src="https://img.shields.io/packagist/l/webiik/webiik.svg"/>
+<img src="https://img.shields.io/badge/dependencies-1-brightgreen.svg"/>
+</p>
 
-Resources
----------
-* [Documentation][1]
-* [Report issues][2]
+Container
+=========
+The Container adds handy methods to most common Pimple functions and then adds automatic injection of dependencies from container to class controller.
 
-[1]: https://www.webiik.com
-[2]: https://github.com/webiik/webiik/issues
-
-Quick examples
---------------
-**Add service to container**
+Example
+-------
 ```php
-addService(string $name, callable $callable): void
+$container = new \Webiik\Container\Container();
+$container->addService('\Webiik\Array\Array', function () {
+    return new \Webiik\Array\Array();
+});
+$array = $container->get('\Webiik\Array\Array');
+```
+
+Adding
+------
+#### Add service as singleton
+When you add service as singleton then always same instance of service will be returned.
+```php
+addService(string $name, callable $factory): void
 ```
 ```php
-$container->addService('\Webiik\Log\Log', function () use (&$container) {
-    return new \Webiik\Log\Log($container);   
+$container->addService('\Webiik\Array\Array', function () {
+    return new \Webiik\Array\Array();
 });
 ```
+> `$factory` must always return object
+#### Add service factory
+When you add service as factory, then always new instance of service will be returned.
+```php
+addServiceFactory(string $name, callable $factory): void
+```
+> `$factory` must always return object
+#### Add parameter
+```php
+addParam(string $name, $val): void
+```
+#### Add function
+```php
+addFunction(string $name, callable $function): void
+```
 
-**Get service from container**
+Getting
+-------
+#### Get
+Get service, parameter or function from container.
 ```php
 get(string $name)
 ```
 ```php
-$log = $container->get('\Webiik\Log\Log');
+$array = $container->get('\Webiik\Array\Array');
 ```
-
-**Inject dependencies from container to your class**
+#### Check
+Check if service, parameter or function is stored in container. 
 ```php
-injectTo(string $className): array
-```
-```php
-$myClass = new \MyNameSpace\MyClass(...$container->injectTo('\MyNameSpace\MyClass'));
+isIn(string $name): bool
 ```
 ```php
-namespace MyNameSpace;
+$container->isIn('\Webiik\Array\Array');
+```
 
-use Webiik\Log\Log;
+Dependency injection
+--------------------
+Container provides automatic dependency injection from Container to class controller using the method `injectTo(string $className): array`. However it requires to follow these naming conventions:
+ 
+#### Inject service by class name
+1. Add service with same name as full name of underlying class:
+   ```php
+   $container->addService('\Webiik\Array\Array', function () {
+      return new \Webiik\Array\Array();   
+   });
+   ```
+2. Use full class name as type parameter in controller in your class:
+   ```php   
+   public function __construct(\Webiik\Array\Array $array)
+   {
+       $this->array = $array;
+   }
+   ```
+   > Container will search for service with name `\Webiik\Array\Array`. 
+3. Inject dependencies:
+   ```php
+   $myClass = new MyClass(...$container->injectTo('MyClass'));
+   ```
 
-class MyClass
-{
-    private $log;
+#### Inject service by service name
+1. Add service with name matching the following regex `/ws[A-Z]/`:
+   ```php
+   $container->addService('wsArray', function () {
+      return new \Webiik\Array\Array();   
+   });
+   ```
+2. Add class name alias to your class:
+   ```php
+   use Webiik\Array\Array as wsArray;
+   ```
+3. Add doc block with parameter type to controller of your class:   
+   ```php
+   /**
+   * @param wsArray $array
+   */   
+   public function __construct(wsArray $array)
+   {
+       $this->array = $array;
+   }
+   ```
+   > Container will search for service with name `wsArray`. 
+4. Inject dependencies:
+   ```php
+   $myClass = new MyClass(...$container->injectTo('MyClass'));
+
+#### Inject function
+1. Add parameter with any name:
+   ```php
+   $container->addFunction('myFnName', function() {
+       echo 'Hello!';
+   });
+   ```
+2. Use parameter name in controller in your class:
+   ```php   
+   public function __construct($myFnName)
+   {
+       $myFnName(); // Hello
+   }
+   ```
+   > Container will search for parameter with name `myParamName`. 
+3. Inject dependencies:
+   ```php
+   $myClass = new MyClass(...$container->injectTo('MyClass'));
+   ```
    
-    public function __construct(Log $log)
-    {
-        $this->log = $log;       
-    }
-}
-```
-> You can also inject dependencies by service name instead of class name. However it requires three things.
-> * Name your service to match the following regex `/ws[A-Z]/`
-> ```php
-> $container->addService('wsLog', function () use (&$container) {
->     return new \Webiik\Log\Log($container);   
-> });
-> ```
-> * Add class name alias that matches your service name and add doc block with parameter type to __construct
-> ```php
-> namespace MyNameSpace;
-> 
-> use Webiik\Log\Log as wsLog;
-> 
-> class MyClass
-> {
->     private $log;
->    
->    /**
->     * @param wsLog $log
->     */
->     public function __construct(wsLog $log)
->     {
->         $this->log = $log;       
->     }
-> }
-> ```  
+#### Inject parameter
+1. Add parameter with any name:
+   ```php
+   $container->addParam('myParamName', 'Hello!');
+   ```
+2. Use parameter name in controller in your class:
+   ```php   
+   public function __construct($myParamName)
+   {
+       echo $myParamName; // Hello
+   }
+   ```
+   > Container will search for parameter with name `myParamName`. 
+3. Inject dependencies:
+   ```php
+   $myClass = new MyClass(...$container->injectTo('MyClass'));
+   ```   
+
+Resources
+---------
+* [Webiik framework][1]
+* [Report issues][2]
+* [Pimple][3]
+
+[1]: https://github.com/webiik/webiik
+[2]: https://github.com/webiik/webiik-components/issues
+[3]: https://github.com/silexphp/Pimple  
