@@ -19,19 +19,19 @@ $array = $container->get('\Webiik\Array\Array');
 
 Adding
 ------
-#### Add service as singleton
-When you add service as singleton then always same instance of service will be returned.
+#### Add service
+Always same instance of service will be returned.
 ```php
 addService(string $name, callable $factory): void
 ```
+> `$factory` must always return object
 ```php
 $container->addService('\Webiik\Array\Array', function () {
     return new \Webiik\Array\Array();
 });
 ```
-> `$factory` must always return object
 #### Add service factory
-When you add service as factory, then always new instance of service will be returned.
+Always new instance of service will be returned.
 ```php
 addServiceFactory(string $name, callable $factory): void
 ```
@@ -43,6 +43,18 @@ addParam(string $name, $val): void
 #### Add function
 ```php
 addFunction(string $name, callable $function): void
+```
+```php
+$container->addFunction('myFn', function ($a, $b) {
+    return $a * $b;
+});
+```
+#### Access container within callable
+```php
+$container->addService('Service', function ($pimple) use ($container) {
+    // $container - Container
+    // $pimple - Pimple    
+});
 ```
 
 Getting
