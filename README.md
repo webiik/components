@@ -1,7 +1,5 @@
-<p align="center">
 <img src="https://img.shields.io/packagist/l/webiik/webiik.svg"/>
 <img src="https://img.shields.io/badge/dependencies-0-brightgreen.svg"/>
-</p>
 
 Log
 ===
@@ -21,7 +19,7 @@ $log->write();
 Loggers
 -------
 #### Add Logger
-To process logs you have to add some logger(s) to Log component. Log component comes with 3 optional loggers: ErrorLogger, FileLogger and MailLogger.
+To process logs you have to add some logger(s) to Log. Log comes with 3 optional loggers: ErrorLogger, FileLogger and MailLogger.
 ```php
 addLogger(callable $factory): Logger
 ```
@@ -31,8 +29,23 @@ $log->addLogger(function () {
 });
 ```
 #### Write Custom Logger
-There is only one rule to write custom logger. Your custom logger has to implement method `write(Message $message): void;` from the `LoggerInterface`.   
+There is only one rule to write custom logger. Your custom logger has to implement method `write` described in `LoggerInterface`.   
+```php
+<?php
+declare(strict_types=1);
 
+namespace Webiik\Log\Logger;
+
+use Webiik\Log\Message;
+
+class CustomLogger implements LoggerInterface
+{
+    public function write(Message $message): void
+    {
+        // Process Message...
+    }
+}
+```
 Log Messages
 ------------
 #### Add Log Message
@@ -59,7 +72,7 @@ write(): void
 $log->write();
 ```
 #### Add Extra Data
-If logger requires extra data you can add them to log message.
+If logger requires extra data you can add extra data to log message.
 ```php
 $log->info('Hello Dolly!')->setData(['greeter' => 'Molly']);
 ```
