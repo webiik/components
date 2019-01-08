@@ -19,7 +19,7 @@ $array = $container->get('\Webiik\Array\Array');
 
 Adding
 ------
-#### Add service
+#### Add Service
 Always same instance of service will be returned.
 ```php
 addService(string $name, callable $factory): void
@@ -30,17 +30,17 @@ $container->addService('\Webiik\Array\Array', function () {
     return new \Webiik\Array\Array();
 });
 ```
-#### Add service factory
+#### Add Service Factory
 Always new instance of service will be returned.
 ```php
 addServiceFactory(string $name, callable $factory): void
 ```
 > `$factory` must always return object
-#### Add parameter
+#### Add Parameter
 ```php
 addParam(string $name, $val): void
 ```
-#### Add function
+#### Add Function
 ```php
 addFunction(string $name, callable $function): void
 ```
@@ -49,7 +49,7 @@ $container->addFunction('myFn', function ($a, $b) {
     return $a * $b;
 });
 ```
-#### Access container within callable
+#### Access Container Within Callable
 ```php
 $container->addService('Service', function ($pimple) use ($container) {
     // $container - Container
@@ -76,11 +76,11 @@ isIn(string $name): bool
 $container->isIn('\Webiik\Array\Array');
 ```
 
-Dependency injection
+Dependency Injection
 --------------------
 Container provides automatic dependency injection from Container to class controller using the method `injectTo(string $className): array`. However it requires to follow these naming conventions:
  
-#### Inject service by class name
+#### Inject Service by Class Name
 1. Add service with same name as full name of underlying class:
    ```php
    $container->addService('\Webiik\Array\Array', function () {
@@ -100,7 +100,7 @@ Container provides automatic dependency injection from Container to class contro
    $myClass = new MyClass(...$container->injectTo('MyClass'));
    ```
 
-#### Inject service by service name
+#### Inject Service by Service Name
 1. Add service with name matching the following regex `/ws[A-Z]/`:
    ```php
    $container->addService('wsArray', function () {
@@ -126,7 +126,7 @@ Container provides automatic dependency injection from Container to class contro
    ```php
    $myClass = new MyClass(...$container->injectTo('MyClass'));
 
-#### Inject function
+#### Inject Function
 1. Add parameter with any name:
    ```php
    $container->addFunction('myFnName', function() {
@@ -146,7 +146,7 @@ Container provides automatic dependency injection from Container to class contro
    $myClass = new MyClass(...$container->injectTo('MyClass'));
    ```
    
-#### Inject parameter
+#### Inject Parameter
 1. Add parameter with any name:
    ```php
    $container->addParam('myParamName', 'Hello!');
