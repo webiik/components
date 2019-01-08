@@ -6,10 +6,10 @@ namespace Webiik\Error;
 class Error
 {
     /**
-     * Factory of underlying log service
-     * If no factory is set, PHP's error_log function will be used instead
+     * Function with underlying log service
+     * If no function is set, error_log function will be used instead
      *
-     * Factory is injected with the following parameters:
+     * Function is injected with the following parameters:
      * string $level, string $message, array $data
      *
      * @var callable
@@ -65,11 +65,11 @@ class Error
     }
 
     /**
-     * @param callable $factory
+     * @param callable $function
      */
-    public function setLogService(callable $factory)
+    public function setLogService(callable $function): void
     {
-        $this->logService = $factory;
+        $this->logService = $function;
     }
 
     /**
