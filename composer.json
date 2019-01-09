@@ -1,7 +1,7 @@
 {
   "name": "webiik/mail",
   "type": "library",
-  "description": "The Mail component adds common interface above underlying mail classes, but it keeps accessible all their methods.",
+  "description": "The Mail brings common interface for sending emails, no matter what mail library you want to use. Out of the box it supports PHPMailer and SwiftMailer.",
   "keywords": ["mail"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
