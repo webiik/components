@@ -1,7 +1,7 @@
 {
   "name": "webiik/error",
   "type": "library",
-  "description": "The Error component provides more control over managing PHP errors.",
+  "description": "The Error provides more control over displaying and logging PHP errors.",
   "keywords": ["error", "exception", "log"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
