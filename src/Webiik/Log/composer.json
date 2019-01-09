@@ -1,7 +1,7 @@
 {
   "name": "webiik/log",
   "type": "library",
-  "description": "The Log component provides simple solution for advanced logging.",
+  "description": "The Log provides simple solution for advanced logging.",
   "keywords": ["log", "monolog", "logging"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
