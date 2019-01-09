@@ -160,7 +160,7 @@ getAlternativeBody(): string
 ```
 > Alternative body for clients without support of text/html.
 #### Attachments
-To attach existing files use:
+To attach existing file use:
 ```php
 addFileAttachment(string $path, string $filename = '', string $mime = ''): void
 ```
@@ -175,14 +175,14 @@ addDynamicAttachment(string $string, string $filename, string $mime = ''): void
 getDynamicAttachments(): array
 ```
 #### Embeds
-To embed existing images use:
+To embed existing image use:
 ```php
 addFileEmbed(string $path, string $cid, string $filename = '', string $mime = ''): void
 ```
 ```php
 getFileEmbeds(): array
 ```
-To embed images generated on the fly use:
+To embed image generated on the fly use:
 ```php
 addDynamicEmbed(string $string, string $cid, string $filename = '', string $mime = ''): void
 ```
