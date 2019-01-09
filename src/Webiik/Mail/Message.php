@@ -83,7 +83,7 @@ class Message
     /**
      * @param string $charset
      */
-    public function setCharset(string $charset)
+    public function setCharset(string $charset): void
     {
         $this->charset = $charset;
     }
@@ -250,7 +250,7 @@ class Message
     /**
      * @return int
      */
-    public function getPriority()
+    public function getPriority(): int
     {
         return $this->priority;
     }
