@@ -30,10 +30,10 @@ $log->addLogger(function () {
     return new \Webiik\Log\Logger\ErrorLogger();
 });
 ```
-#### Write Custom Logger
-There is only one rule to write custom logger. Your custom logger has to implement method `write` described in `LoggerInterface`.   
+#### Create Custom Logger
+To write your custom logger, your have to implement method `write` described in `LoggerInterface`.   
 ```php
-<?php
+// CustomLogger.php
 declare(strict_types=1);
 
 namespace Webiik\Log\Logger;
