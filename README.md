@@ -1,3 +1,8 @@
+<p align="left">
+<img src="https://img.shields.io/packagist/l/webiik/webiik.svg"/>
+<img src="https://img.shields.io/badge/dependencies-1&#x2D7;2-brightgreen.svg"/>
+</p>
+
 Mail
 ====
 The Mail brings common interface for sending emails, no matter what mail library you want to use. Out of the box it supports PHPMailer and SwiftMailer.
@@ -54,13 +59,14 @@ $mail->setMailer(function () {
     return new \Webiik\Mail\Mailer\PHPMailer(new \PHPMailer\PHPMailer\PHPMailer());
 });
 ```
+> Don't forget to install library used by mailer e.g. `composer require phpmailer/phpmailer` 
 #### Access mailer core library
 If you need it, you can access underlying library of mailer.
 ```php
 getMailerCore()
 ```
 ```php
-$mail->getMailerCore(); // Return eg. \PHPMailer\PHPMailer\PHPMailer()
+$mail->getMailerCore(); // Return e.g. \PHPMailer\PHPMailer\PHPMailer()
 ```
 #### Create Custom Mailer
 To write your custom mailer, your have to implement interface `MailerInterface`.
