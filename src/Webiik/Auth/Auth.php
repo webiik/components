@@ -26,6 +26,30 @@ class Auth
     private $session;
 
     /**
+     * Login session name
+     * @var string
+     */
+    private $sessionName = 'logged';
+
+    /**
+     * User id from last login check using methods: isLogged. isAuthorised
+     * @var int|string
+     */
+    private $uid;
+
+    /**
+     * User role from last login check using methods: isLogged. isAuthorised
+     * @var string
+     */
+    private $role;
+
+    /**
+     * All allowed user roles and associated actions e.g. ['user' => ['account-read']]
+     * @var array
+     */
+    private $allowedAuthority = [];
+
+    /**
      * Time in sec to auto logout user on inactivity between two requests
      *
      * Note:
@@ -37,10 +61,10 @@ class Auth
     private $autoLogoutTime = 0;
 
     /**
-     * Login session name
-     * @var string
+     * Indicates if auto logout timestamp has been updated during current request
+     * @var bool
      */
-    private $sessionName = 'logged';
+    private $autoLogoutTsUpdated = false;
 
     /**
      * Permanent identifier Storage
@@ -63,24 +87,6 @@ class Auth
      * @var int
      */
     private $permanentLoginTime = 0;
-
-    /**
-     * All available(allowed) user roles and associated actions e.g. ['user' => ['account-read']]
-     * @var array
-     */
-    private $allowedAuthority = [];
-
-    /**
-     * User id from last login check using methods: isLogged. isAuthorised
-     * @var int|string
-     */
-    private $uid;
-
-    /**
-     * User role from last login check using methods: isLogged. isAuthorised
-     * @var string
-     */
-    private $role;
 
     /**
      * Auth constructor.
@@ -323,10 +329,10 @@ class Auth
      */
     public function updateAutoLogoutTs(): void
     {
-        if (!isset($this->tsUpdated)) { // save resources and prevent repeated update
+        if (!$this->autoLogoutTsUpdated) { // save resources and prevent repeated update
             if (session_status() != PHP_SESSION_NONE && $this->session->isInSession($this->sessionName)) {
                 $_SESSION[$this->sessionName]['ts'] = $_SERVER['REQUEST_TIME'];
-                $this->tsUpdated = true;
+                $this->autoLogoutTsUpdated = true;
             }
         }
     }
