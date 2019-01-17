@@ -9,7 +9,7 @@ class Mail
 {
     /**
      * Mailer factory or instance after call getMailer
-     * @var
+     * @var callable|MailerInterface
      */
     private $mailer;
 
