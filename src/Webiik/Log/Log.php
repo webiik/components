@@ -15,7 +15,7 @@ class Log
     const DEBUG = 'debug';
 
     /**
-     * Loggers we will use for logging
+     * Array of Logger we will use for logging
      * @var array
      */
     private $loggers = [];
@@ -180,9 +180,9 @@ class Log
      */
     public function addLogger(callable $factory): Logger
     {
-        $factory = new Logger($factory);
-        $this->loggers[] = $factory;
-        return $factory;
+        $logger = new Logger($factory);
+        $this->loggers[] = $logger;
+        return $logger;
     }
 
     /**
@@ -201,7 +201,6 @@ class Log
     public function write(): void
     {
         $catchedExceptions = [];
-        $loggerInstances = [];
 
         foreach ($this->messages as $message) {
             /* @var $message Message */
@@ -223,14 +222,7 @@ class Log
                 if ($levelMatch && $groupMatch && !$negativeGroupMatch) {
                     // Log this message with this logger
                     try {
-                        // Safe resources and instantiate each logger only once per write
-                        if (isset($loggerInstances[$loggerIndex])) {
-                            $loggerInstance = $loggerInstances[$loggerIndex];
-                        } else {
-                            $loggerInstance = $logger->createInstance();
-                            $loggerInstances[] = $loggerInstance;
-                        }
-                        $loggerInstance->write($message);
+                        $logger->getInstance()->write($message);
                     } catch (\Exception $exception) {
                         // When logger throws an exception, remove it from loggers
                         // and then log the exception. It is necessary for safe
@@ -250,9 +242,6 @@ class Log
 
         // Clear all written Messages
         $this->clearLogs();
-
-        // Remove logger instances from memory
-        unset($loggerInstances);
 
         if ($this->silent) {
             // Log exceptions from failed loggers

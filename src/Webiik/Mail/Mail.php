@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace Webiik\Mail;
 
+use Webiik\Mail\Mailer\MailerInterface;
+
 class Mail
 {
     /**
-     * @var callable
+     * Mailer factory or instance after call getMailer
+     * @var
      */
     private $mailer;
 
@@ -27,8 +30,7 @@ class Mail
      */
     public function send(array $messages): array
     {
-        $mailer = $this->mailer;
-        return $mailer()->send($messages);
+        return $this->getMailer()->send($messages);
     }
 
     /**
@@ -47,7 +49,21 @@ class Mail
      */
     public function getMailerCore()
     {
-        $mailer = $this->mailer;
-        return $mailer()->core();
+        return $this->getMailer()->core();
+    }
+
+    /**
+     * Get mailer instance
+     * @return MailerInterface
+     */
+    private function getMailer(): MailerInterface
+    {
+        // Instantiate mailer only once
+        if (is_callable($this->mailer)) {
+            $mailer = $this->mailer;
+            $this->mailer = $mailer();
+        }
+
+        return $this->mailer;
     }
 }

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Webiik\Log;
 
+use Webiik\Log\Logger\LoggerInterface;
+
 class Logger
 {
     /**
@@ -21,9 +23,10 @@ class Logger
     private $negativeGroups = [];
 
     /**
-     * @var callable
+     * Logger factory or instance after call getInstance
+     * @var
      */
-    private $factory;
+    private $logger;
 
     /**
      * Logger constructor.
@@ -31,7 +34,7 @@ class Logger
      */
     public function __construct(callable $factory)
     {
-        $this->factory = $factory;
+        $this->logger = $factory;
     }
 
     /**
@@ -120,11 +123,15 @@ class Logger
 
     /**
      * Get underlying logger instance
-     * @return mixed
+     * @return LoggerInterface
      */
-    public function createInstance()
+    public function getInstance(): LoggerInterface
     {
-        $factory = $this->factory;
-        return $factory();
+        // Instantiate logger only once
+        if (is_callable($this->logger)) {
+            $logger = $this->logger;
+            $this->logger = $logger();
+        }
+        return $this->logger;
     }
 }
