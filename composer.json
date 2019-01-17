@@ -1,0 +1,25 @@
+{
+  "name": "webiik/data",
+  "type": "library",
+  "description": "The Data is primitive key-value based data container.",
+  "keywords": ["data", "container"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\Data\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
