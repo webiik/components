@@ -7,3 +7,4 @@ analysis/*
 !analysis/analyse.sh
 /*.php
 *.log
+/tmp
