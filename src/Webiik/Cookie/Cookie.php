@@ -31,7 +31,7 @@ class Cookie
 
     /**
      * Set the (sub)domain that the cookie is available to
-     * @param $domain
+     * @param string $domain
      */
     public function setDomain(string $domain): void
     {
@@ -40,7 +40,7 @@ class Cookie
 
     /**
      * Set the path(URI) on the server in which the cookie will be available on
-     * @param $uri
+     * @param string $uri
      */
     public function setUri(string $uri): void
     {
@@ -49,7 +49,7 @@ class Cookie
 
     /**
      * Set that the cookies should only be transmitted over a secure HTTPS connection from the client
-     * @param $bool
+     * @param bool $bool
      */
     public function setSecure(bool $bool): void
     {
@@ -58,7 +58,7 @@ class Cookie
 
     /**
      * Set that the cookies will be accessible only through the HTTP protocol
-     * @param $bool
+     * @param bool $bool
      */
     public function setHttpOnly(bool $bool): void
     {
@@ -130,12 +130,10 @@ class Cookie
      */
     public function delCookies(): void
     {
-        if (isset($_COOKIE)) {
-            foreach ($_COOKIE as $cookie) {
-                $parts = explode('=', $cookie);
-                $name = trim($parts[0]);
-                $this->delCookie($name);
-            }
+        foreach ($_COOKIE as $cookie) {
+            $parts = explode('=', $cookie);
+            $name = trim($parts[0]);
+            $this->delCookie($name);
         }
         $_COOKIE = [];
     }

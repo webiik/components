@@ -11,11 +11,6 @@ use Webiik\Token\Token;
 class Auth
 {
     /**
-     * @var Session
-     */
-    private $session;
-
-    /**
      * @var Token
      */
     private $token;
@@ -26,10 +21,15 @@ class Auth
     private $cookie;
 
     /**
-     * Permanent identifier Storage factory or instance after call getStorage
-     * @var StorageInterface
+     * @var Session
      */
-    private $storage;
+    private $session;
+
+    /**
+     * Permanent identifier Storage factory or instance after call getStorage
+     * @var StorageInterface|callable|bool
+     */
+    private $storage = false;
 
     /**
      * Resolute login by sections (e.g. lang, app part, ...)
@@ -96,6 +96,19 @@ class Auth
     private $role;
 
     /**
+     * Auth constructor.
+     * @param Token $token
+     * @param Cookie $cookie
+     * @param Session $session
+     */
+    public function __construct(Token $token, Cookie $cookie, Session $session)
+    {
+        $this->token = $token;
+        $this->cookie = $cookie;
+        $this->session = $session;
+    }
+
+    /**
      * @param callable $factory
      */
     public function setStorage(callable $factory)
@@ -158,7 +171,7 @@ class Auth
 
     /**
      * Log in the user
-     * @param $uid
+     * @param string|int $uid
      * @param string $role
      * @param bool $permanent
      */
@@ -179,7 +192,7 @@ class Auth
                     $role,
                     $tokens['selector'],
                     $tokens['key'],
-                    $this->ttl ? ($_SERVER['REQUEST_TIME'] + $this->ttl) : $this->ttl
+                    $this->ttl ? (int)($_SERVER['REQUEST_TIME'] + $this->ttl) : $this->ttl
                 );
             } catch (\Exception $exception) {
                 // Permanent login can't be created due to missing tokens.
@@ -234,7 +247,6 @@ class Auth
 
         // When it's necessary and it's available, try to get login credentials from permanent identifier
         if (!$isLogged && $this->storage && $this->cookie->isCookie($this->cookieName)) {
-
             // Try to get permanent cookie tokens
             $cookieTokens = $this->getPermanentCookieTokens();
             if (!$cookieTokens) {
@@ -365,7 +377,7 @@ class Auth
         $this->cookie->setCookie(
             $this->cookieName,
             $tokens['selector'] . '.' . $tokens['key'],
-            $this->ttl ? ($_SERVER['REQUEST_TIME'] + $this->ttl) : $this->ttl
+            $this->ttl ? (int)($_SERVER['REQUEST_TIME'] + $this->ttl) : $this->ttl
         );
         return $tokens;
     }
@@ -399,7 +411,7 @@ class Auth
 
     /**
      * Set user id and user role found during last login check
-     * @param $uid
+     * @param string|int $uid
      * @param string $role
      */
     private function setLoginCheckCredentials($uid, string $role)

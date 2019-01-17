@@ -14,7 +14,7 @@ class MailLogger implements LoggerInterface
      * Factory is injected with the following parameters:
      * string $to, string $from, string $subject, string $message
      *
-     * @var callable
+     * @var callable|null
      */
     private $mailService;
 

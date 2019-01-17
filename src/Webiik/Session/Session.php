@@ -75,7 +75,7 @@ class Session
 
     /**
      * Set the (sub)domain that the cookie is available to
-     * @param $domain
+     * @param string $domain
      */
     public function setDomain(string $domain): void
     {
@@ -84,7 +84,7 @@ class Session
 
     /**
      * Set the path(URI) on the server in which the cookie will be available on
-     * @param $uri
+     * @param string $uri
      */
     public function setUri(string $uri): void
     {
@@ -93,7 +93,7 @@ class Session
 
     /**
      * Set that the cookies should only be transmitted over a secure HTTPS connection from the client
-     * @param $bool
+     * @param bool $bool
      */
     public function setSecure(bool $bool): void
     {
@@ -102,7 +102,7 @@ class Session
 
     /**
      * Set that the cookies will be accessible only through the HTTP protocol
-     * @param $bool
+     * @param bool $bool
      */
     public function setHttpOnly(bool $bool): void
     {

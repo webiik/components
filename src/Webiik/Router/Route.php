@@ -238,7 +238,7 @@ class Route
             return $replacement . $slash;
         }, $this->getRegex());
 
-        if ($this->missingParameters) {
+        if ($this->missingParameters || !$URI) {
             // If URI parameters are missing, return empty URI
             $URI = '';
         } else {

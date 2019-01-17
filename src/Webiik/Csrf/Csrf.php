@@ -81,7 +81,7 @@ class Csrf
             $tokens = $this->session->getFromSession($this->name);
             if (count($tokens) == $this->max) {
                 end($tokens);
-                $token = key($tokens);
+                $token = (string)key($tokens);
             }
         }
 
