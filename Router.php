@@ -229,7 +229,7 @@ class Router
      */
     private function getBaseRequestURI(): string
     {
-        return (string)substr($this->getRequestURI(), strlen($this->baseURI));
+        return substr($this->getRequestURI(), strlen($this->baseURI));
     }
 
     /**
@@ -261,7 +261,7 @@ class Router
         // e.g. Without this fix route regex /([a-z]+)?/reviews/ would not work correctly for URI /reviews/
         $regex = preg_replace('~(/)(\(.+\)\?)~', '/?$2', $regex);
 
-        return $regex;
+        return (string)$regex;
     }
 
     /**
