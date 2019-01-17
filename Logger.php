@@ -24,7 +24,7 @@ class Logger
 
     /**
      * Logger factory or instance after call getInstance
-     * @var
+     * @var callable|LoggerInterface
      */
     private $logger;
 
