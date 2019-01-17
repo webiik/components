@@ -19,10 +19,10 @@ class FileStorage implements StorageInterface
 
     /**
      * Delete all permanent files that have been not accessed for given ttl.
-     * It's used when permanent login has unlimited ttl to prevent filling the storage with garbage.
+     * This ttl is only used when deleteExpired receives unlimited ttl(0) to prevent filling the storage with garbage.
      * @var int
      */
-    private $ttl = 90 * 24 * 60 * 60;
+    private $defaultTtl = 90 * 24 * 60 * 60;
 
     /**
      * @param string $path
@@ -37,15 +37,15 @@ class FileStorage implements StorageInterface
      */
     public function setExt(string $ext): void
     {
-        $this->ext = '.' . ltrim($ext, '.');
+        $this->ext = ltrim($ext, '.');
     }
 
     /**
-     * @param int $ttl
+     * @param int $defaultTtl
      */
-    public function setTtl(int $ttl): void
+    public function setDefaultTtl(int $defaultTtl): void
     {
-        $this->ttl = $ttl;
+        $this->defaultTtl = $defaultTtl;
     }
 
     /**
@@ -61,7 +61,7 @@ class FileStorage implements StorageInterface
             'uid' => $uid,
             'role' => $role,
             'selector' => $selector,
-            'key' => $key,
+            'key' => hash('sha256', $key),
             'expiration' => $expiration,
         ]);
         file_put_contents($this->getFileName($selector), $data);
@@ -99,12 +99,11 @@ class FileStorage implements StorageInterface
      */
     public function deleteExpired(int $ttl): void
     {
-        $ttl = $ttl ? $ttl : $this->ttl;
-        $expiration = $_SERVER['REQUEST_TIME'] - $ttl;
+        $ttl = $ttl ? $ttl : $this->defaultTtl;
 
         foreach (new \DirectoryIterator($this->path) as $item) {
             if ($item->isFile() && $item->getExtension() == $this->ext) {
-                if ($expiration > $item->getMTime()) {
+                if ($_SERVER['REQUEST_TIME'] - $ttl > $item->getMTime()) {
                     @unlink($item->getPathname());
                 }
             }
@@ -117,6 +116,6 @@ class FileStorage implements StorageInterface
      */
     private function getFileName(string $selector): string
     {
-        return $this->path . $selector . $this->ext;
+        return $this->path . $selector . '.' . $this->ext;
     }
 }
