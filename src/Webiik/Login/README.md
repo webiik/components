@@ -165,6 +165,7 @@ If you want to make the login valid only for the specific part of your app, use 
 setLoginSection(string $name): void
 ```
 ```php
+// Always set this right after instantiation the Login class 
 $login->setLoginSection('en');
 ```
 
@@ -188,17 +189,18 @@ setAutoLogoutTime(int $sec): void
 ```
 ```php
 // Set the automatic logout after 5 minutes of inactivity
+// Always set this right after instantiation the Login class
 $login->setAutoLogoutTime(5 * 60);
 ```
-**DON'T FORGET:** Update the time of last user activity with every http request: 
+**Don't forget** to update the time of last user activity with every http request: 
 ```php
 updateAutoLogoutTs(): void
 ```
 ```php
 // Never call this before isLogged or isAuthorized
+// It would let to the situation, that the user was never logged out
 $login->updateAutoLogoutTs();
 ``` 
-**WARNING:** Never update the time of last user activity before calling the method isLogged or isAuthorized. It would let to the situation, that the user was never logged out.
 
 Resources
 ---------
