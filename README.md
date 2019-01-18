@@ -19,12 +19,6 @@ CC - cyclomatic complexity, LLOC - logical lines of code
 Why to choose Webiik
 --------------------
 Webiik is great for those looking for **simple, fully featured, flexible and efficient** framework. If you think frameworks are unnecessary overhead, you will love Webiik.
-* Pretty URLs
-* Authentication (roles, permanent, social)
-* Multilingual (routing, auth, translations...)
-* Simple to use dependency injection
-* VPS installation helper
-* ...and many more
 
 Documentation
 -------------
@@ -32,9 +26,11 @@ Documentation
 
 Contributing
 ------------
-**!!! HELP WANTED - Write PHPUnit tests for Webiik !!!**
+**HOT TOPICS**
+1. Correct grammar and proofread `README.md` files.
+2. Write PHPUnit tests.
 
-You can contribute in many ways: [Report Bug][3], [Improve Code][1], [Update Documentation][1] or [Request Feature][4]. 
+You can also: [Report Bug][3], [Improve Code][1], [Update Documentation][1] or [Request Feature][4]. 
 
 Security Issues
 ---------------
