@@ -238,7 +238,7 @@ class Login
             }
 
             // Login the user to avoid repeated permanent login checks and so speed up authentication
-            $this->login($identifierData['uid'], $identifierData['role'], false);
+            $this->login($identifierData['uid'], false, $identifierData['role']);
             $this->setLoginCheckCredentials($identifierData['uid'], $identifierData['role']);
             $isLogged = true;
         }
