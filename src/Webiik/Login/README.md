@@ -78,6 +78,9 @@ $login->setPermanentLoginStorage(function () {
 });
 ```
 
+#### Writing Custom Storage
+Every custom storage has to implement `Webiik\Login\Storage\StorageInterface`.
+
 #### Login
 ```php
 login($uid, bool $permanent = false, string $role = ''): void
