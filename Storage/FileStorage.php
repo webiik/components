@@ -61,7 +61,7 @@ class FileStorage implements StorageInterface
             'uid' => $uid,
             'role' => $role,
             'selector' => $selector,
-            'key' => hash('sha256', $key),
+            'key' => $key,
             'expiration' => $expiration,
         ]);
         file_put_contents($this->getFileName($selector), $data);

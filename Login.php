@@ -187,7 +187,7 @@ class Login
                     $uid,
                     $role,
                     $tokens['selector'],
-                    $tokens['key'],
+                    hash('sha256', $tokens['key']),
                     $this->permanentLoginTime ? (int)($_SERVER['REQUEST_TIME'] + $this->permanentLoginTime) : $this->permanentLoginTime
                 );
             } catch (\Exception $exception) {
