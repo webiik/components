@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Webiik\Auth;
+namespace Webiik\Login;
 
-use Webiik\Auth\Storage\StorageInterface;
+use Webiik\Login\Storage\StorageInterface;
 use Webiik\Cookie\Cookie;
 use Webiik\Session\Session;
 use Webiik\Token\Token;
 
-class Auth
+class Login
 {
     /**
      * @var Token
@@ -89,7 +89,6 @@ class Auth
     private $permanentLoginTime = 0;
 
     /**
-     * Auth constructor.
      * @param Token $token
      * @param Cookie $cookie
      * @param Session $session
@@ -104,7 +103,7 @@ class Auth
     /**
      * @param callable $factory
      */
-    public function setPermanentLoginStorage(callable $factory)
+    public function setPermanentLoginStorage(callable $factory): void
     {
         $this->permanentLoginStorage = $factory;
     }
@@ -123,6 +122,14 @@ class Auth
     public function setPermanentLoginTime(int $sec): void
     {
         $this->permanentLoginTime = $sec;
+    }
+
+    /**
+     * @param string $sessionName
+     */
+    public function setSessionName(string $sessionName): void
+    {
+        $this->sessionName = $sessionName;
     }
 
     /**
@@ -161,10 +168,10 @@ class Auth
     /**
      * Log in the user
      * @param string|int $uid
-     * @param string $role
      * @param bool $permanent
+     * @param string $role
      */
-    public function login($uid, string $role = '', bool $permanent = false): void
+    public function login($uid, bool $permanent = false, string $role = ''): void
     {
         $this->session->sessionRegenerateId();
         $this->session->setToSession($this->sessionName, [
@@ -254,7 +261,7 @@ class Auth
      * @param array $actions
      * @return bool
      */
-    public function isAuthorised(string $role, array $actions = []): bool
+    public function isAuthorized(string $role, array $actions = []): bool
     {
         if (!$this->isLogged()) {
             return false;
@@ -285,7 +292,7 @@ class Auth
     /**
      * Log out the user
      */
-    public function logout()
+    public function logout(): void
     {
         // Delete login session
         $this->session->delFromSession($this->sessionName);
