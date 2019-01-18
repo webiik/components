@@ -1,8 +1,8 @@
 {
-  "name": "webiik/auth",
+  "name": "webiik/login",
   "type": "library",
-  "description": "The Auth provides advanced authentication and authorisation.",
-  "keywords": ["auth", "authentication", "authorisation"],
+  "description": "The Login provides methods to manage user login state.",
+  "keywords": ["login", "auth", "authentication", "authorisation"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
   "authors": [
@@ -19,7 +19,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Webiik\\Auth\\": ""
+      "Webiik\\Login\\": ""
     },
     "exclude-from-classmap": [
       "/Tests/"
