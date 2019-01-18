@@ -187,7 +187,8 @@ To activate automatic logout of inactive users, set the time of automatic logout
 setAutoLogoutTime(int $sec): void
 ```
 ```php
-$login->logout();
+// Set the automatic logout after 5 minutes of inactivity
+$login->setAutoLogoutTime(5 * 60);
 ```
 **DON'T FORGET:** Update the time of last user activity with every http request: 
 ```php
