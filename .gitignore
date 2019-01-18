@@ -3,8 +3,7 @@
 .scannerwork
 composer.lock
 vendor
-analysis/*
-!analysis/analyse.sh
+analysis/php*
+analysis/sonar
 /*.php
-*.log
 /tmp

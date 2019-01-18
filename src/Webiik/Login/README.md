@@ -3,12 +3,14 @@
 <img src="https://img.shields.io/badge/dependencies-3-brightgreen.svg"/>
 </p>
 
-Auth
-====
-The Auth provides advanced authentication and authorisation:
-* user roles and actions
+Login
+=====
+The Login provides methods to manage user login state. It supports:
 * remember me
+* user roles and actions
 * optional login resolution (e.g. by lang, app part, ...)
+
+> Note: This class is meant to be used after successful authentication and authorisation the user.
 
 Resources
 ---------
