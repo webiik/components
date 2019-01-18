@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Webiik\Auth\Storage;
+namespace Webiik\Login\Storage;
 
 interface StorageInterface
 {
