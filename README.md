@@ -111,8 +111,6 @@ $login->setPermanentCookieName('myPermanentCookie');
 
 Login Check
 -----------
-#### User Login Check
-Check if the user is logged in:
 ```php
 isLogged(): bool
 ```
@@ -171,8 +169,6 @@ $login->setLoginSection('en');
 
 Logout
 ------
-#### Logout
-Log the user out:
 ```php
 logout(): void
 ```
