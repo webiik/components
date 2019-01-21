@@ -25,7 +25,7 @@ if ($csrf->validate($_POST[$csrf->getName()])) {
 
 Configuration
 -------------
-#### setName
+### setName
 ```php
 setName(string $name): void
 ```
@@ -33,7 +33,7 @@ setName(string $name): void
 ```php
 $csrf->setName('my-csrf-token');
 ```
-#### setMax
+### setMax
 ```php
 setMax(int $max): void
 ```
@@ -46,7 +46,7 @@ $csrf->setMax(5);
 
 Generating
 ----------
-#### create
+### create
 ```php
 create(bool $safe = false): string
 ```
@@ -58,7 +58,7 @@ $csrfToken = $csrf->create();
 
 Comparison
 ----------
-#### validate
+### validate
 ```php
 validate(string $token, bool $safe): bool
 ```

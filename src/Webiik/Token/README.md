@@ -19,7 +19,7 @@ if ($token->compare('vuefjsdfk', $secureToken)) {
 
 Generating
 ----------
-#### generate
+### generate
 ```php
 generate($strength = 16): string
 ```
@@ -32,7 +32,7 @@ try {
 }
 ```
 
-#### generateCheap 
+### generateCheap 
 ```php
 generateCheap($length = 32): string
 ```
@@ -43,7 +43,7 @@ $token->generateCheap();
 
 Comparison
 ----------
-#### compare
+### compare
 ```php
 compare(string $original, string $imprint): bool
 ```
