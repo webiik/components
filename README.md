@@ -13,7 +13,7 @@ Example
 $csrf = new \Webiik\Csrf\Csrf($token, $session);
 $token = $csrf->create();
 
-// Send the $token to the next request, e.g. using $_POST...
+// Now send the $token to the next request, e.g. using $_POST...
 ```
 In the next request validate token:
 ```php
@@ -56,7 +56,7 @@ $csrfToken = $csrf->create();
 ```
 > Safe tokens are slower to generate and require more resources.
 
-Comparison
+Validation
 ----------
 ### validate
 ```php
