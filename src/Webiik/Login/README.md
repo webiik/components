@@ -5,7 +5,7 @@
 
 Login
 =====
-The Login provides methods to manage user login state. It supports:
+The Login manages the user login state. It supports:
 * permanent login
 * automatic logout of inactive users
 * user roles and actions

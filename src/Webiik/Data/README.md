@@ -5,7 +5,56 @@
 
 Data
 ====
-The Data is primitive key-value based data container. 
+The Data is simple, read/write-only, key-value data container.
+
+Example
+-------
+```php
+$dataContainer = new \Webiik\Data\Data();
+$dataContainer->set('key', 'val');
+```
+
+Adding
+------
+#### set
+```php
+set(string $key, $data): void
+```
+**set()** sets an item to the container with given **$key**.
+```php
+$dataContainer->set('key', '$val');
+```
+
+Checking
+--------
+#### isIn
+```php
+isIn(string $key): bool
+```
+**isIn()** checks the container for the item with given **$key**. If the item is found, it returns **true**. 
+```php
+$dataContainer->isIn('key');
+```
+
+Getting
+-------
+#### get
+```php
+get(string $key)
+```
+**get()** gets the item from the container by given **$key**.
+```php
+$dataContainer->get('key');
+```
+
+#### getAll
+```php
+getAll(): array
+```
+**getAll()** returns key-value array with all items stored in the container.
+```php
+$dataContainer->getAll();
+```
 
 Resources
 ---------
