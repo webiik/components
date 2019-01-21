@@ -1,7 +1,7 @@
 {
   "name": "webiik/login",
   "type": "library",
-  "description": "The Login provides methods to manage user login state.",
+  "description": "The Login manages the user login state.",
   "keywords": ["login", "auth", "authentication", "authorisation"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
