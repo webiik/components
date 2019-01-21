@@ -1,7 +1,7 @@
 {
   "name": "webiik/data",
   "type": "library",
-  "description": "The Data is primitive key-value based data container.",
+  "description": "The Data is simple, read/write-only, key-value data container.",
   "keywords": ["data", "container"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
