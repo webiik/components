@@ -35,7 +35,7 @@ class Csrf
      *
      * @var int
      */
-    private $max = 10;
+    private $max = 5;
 
     /**
      * @param Token $token
@@ -73,9 +73,11 @@ class Csrf
 
     /**
      * Create CSRF token
+     * @param bool $safe
+     * @throws \Exception
      * @return string
      */
-    public function create(): string
+    public function create(bool $safe = false): string
     {
         if ($this->session->isInSession($this->name)) {
             $tokens = $this->session->getFromSession($this->name);
@@ -86,7 +88,7 @@ class Csrf
         }
 
         if (!isset($token)) {
-            $token = $this->token->generateCheap(16);
+            $token = $safe ? $this->token->generate(8) : $this->token->generateCheap(16);
             $this->session->addToSession($this->name, [$token => true]);
         }
 
@@ -96,16 +98,36 @@ class Csrf
     /**
      * Check CSRF token and if it's valid, remove it from session
      * @param string $token
+     * @param bool $safe
      * @return bool
      */
-    public function validate(string $token): bool
+    public function validate(string $token, bool $safe = false): bool
     {
         $isOk = false;
+
+        // Get tokens from session or set empty tokens array
         if ($this->session->isInSession($this->name)) {
             $tokens = $this->session->getFromSession($this->name);
+        } else {
+            $tokens = [];
+        }
+
+        // Check whether the token is valid. (not safe, but fast)
+        if (!$safe) {
             $isOk = isset($tokens[$token]);
             unset($_SESSION[$this->name][$token]);
         }
+
+        // Check whether the token is valid. (safe, but slower)
+        if ($safe) {
+            foreach ($tokens as $originalToken) {
+                if ($this->token->compare($originalToken, $token)) {
+                    $isOk = true;
+                    break;
+                }
+            }
+        }
+
         return $isOk;
     }
 }
