@@ -1,7 +1,7 @@
 {
   "name": "webiik/csrf",
   "type": "library",
-  "description": "The Csrf generates and validates CSRF tokens.",
+  "description": "The Csrf provides CSRF protection.",
   "keywords": ["token"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
