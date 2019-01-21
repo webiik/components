@@ -16,7 +16,7 @@ $dataContainer->set('key', 'val');
 
 Adding
 ------
-#### set
+### set
 ```php
 set(string $key, $data): void
 ```
@@ -27,7 +27,7 @@ $dataContainer->set('key', '$val');
 
 Checking
 --------
-#### isIn
+### isIn
 ```php
 isIn(string $key): bool
 ```
@@ -38,7 +38,7 @@ $dataContainer->isIn('key');
 
 Getting
 -------
-#### get
+### get
 ```php
 get(string $key)
 ```
@@ -47,7 +47,7 @@ get(string $key)
 $dataContainer->get('key');
 ```
 
-#### getAll
+### getAll
 ```php
 getAll(): array
 ```
