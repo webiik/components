@@ -24,7 +24,7 @@ class Data
      * @param string $key
      * @return bool
      */
-    public function isIn(string $key)
+    public function isIn(string $key): bool
     {
         return isset($this->data[$key]);
     }
@@ -39,9 +39,9 @@ class Data
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getAll()
+    public function getAll(): array
     {
         return $this->data;
     }
