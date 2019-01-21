@@ -51,23 +51,12 @@ class Token
 
     /**
      * Timing-attack safe token comparison (non unicode)
-     * @param string $imprint
      * @param string $original
+     * @param string $imprint
      * @return bool
      */
-    public function compare(string $imprint, string $original): bool
+    public function compare(string $original, string $imprint): bool
     {
-        $originalLength = strlen($original);
-        $imprintLength = strlen($imprint);
-
-        // Always compare whole length of the original to prevent the timing-attack
-        for ($i = 0; $i < $originalLength; $i++) {
-            $imprintChar = isset($imprint[$i]) ? $imprint[$i] : '';
-            if (ord($original[$i]) !== ord($imprintChar)) {
-                $notEqual = true;
-            }
-        }
-
-        return isset($notEqual) || $originalLength < $imprintLength ? false : true;
+        return hash_equals($original, $imprint);
     }
 }
