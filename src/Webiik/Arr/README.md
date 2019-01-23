@@ -21,7 +21,7 @@ Adding
 ```php
 set(string $key, $val, array &$array): void
 ```
-**set()** sets the value **$val** to the **$array** with given (dot notation) **$key**.
+**set()** sets value **$val** to **$array** under (dot notation) **$key**.
 ```php
 $arr->set('dot.notation.key', ['key' => 'val'], $array);
 ```
@@ -30,18 +30,18 @@ $arr->set('dot.notation.key', ['key' => 'val'], $array);
 ```php
 add(string $key, $val, array &$array): void
 ```
-**add()** ads the value **$val** to the **$array** with given (dot notation) **$key**.
+**add()** ads value **$val** to **$array** under (dot notation) **$key**.
 ```php
 $arr->add('dot.notation.key', 'val', $array);
 ```
 
-Checking
---------
+Check
+-----
 ### isIn
 ```php
 isIn(string $key, array $array): bool
 ```
-**isIn()** checks the array for the item with given (dot notation) **$key**. If the item is found, it returns **true**.
+**isIn()** determines if **$key** is set in array and if its value is not **NULL**.
 ```php
 $arr->isIn('dot.notation.key', $array)
 ```
@@ -52,18 +52,18 @@ Getting
 ```php
 get(string $key, array $array)
 ```
-**get()** gets the item from the **$array** by given (dot notation) **$key**.
+**get()** gets value from **$array** by (dot notation) **$key**.
 ```php
 $arr->get('dot.notation.key', $array)
 ```
 
-Deleting
+Deletion
 --------
 ### delete
 ```php
 delete(string $key, array &$array): void
 ```
-**delete()** removes the item from the **$array** by given (dot notation) **$key**.
+**delete()** removes value from **$array** by (dot notation) **$key**.
 ```php
 $arr->delete('dot.notation.test', $array);
 ```

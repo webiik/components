@@ -20,27 +20,26 @@ $log->write();
 
 Loggers
 -------
-#### Add Logger
-To process logs you have to add some logger(s) to Log. Log comes with 3 optional loggers: ErrorLogger, FileLogger and MailLogger.
+### addLogger
 ```php
 addLogger(callable $factory): Logger
 ```
+**addLogger()** creates new **Logger** and injects **$factory** into it. Adds created Logger to **Log** and returns it. To process logs you have to add some Logger(s) to Log. Log comes with 3 optional loggers: ErrorLogger, FileLogger and MailLogger.
 ```php
 $log->addLogger(function () {
     return new \Webiik\Log\Logger\ErrorLogger();
 });
 ```
-#### Create Custom Logger
-To write your custom logger, your have to implement method `write` described in `LoggerInterface`.   
+**Write Custom Logger**
+
+You can write your custom logger. Only thing you have to do is to implement `Webiik\Log\Logger\LoggerInterface`.   
 ```php
 // CustomLogger.php
 declare(strict_types=1);
 
-namespace Webiik\Log\Logger;
-
 use Webiik\Log\Message;
 
-class CustomLogger implements LoggerInterface
+class CustomLogger implements Webiik\Log\Logger\LoggerInterface
 {
     public function write(Message $message): void
     {
@@ -48,9 +47,10 @@ class CustomLogger implements LoggerInterface
     }
 }
 ```
-Log Messages
-------------
-#### Add Log Message
+
+Messages
+--------
+### add
 ```php
 emergency(string $message, array $context = []): Message
 alert(string $message, array $context = []): Message
@@ -62,27 +62,35 @@ info(string $message, array $context = []): Message
 debug(string $message, array $context = []): Message
 log(string $level, string $message, array $context = []): Message
 ```
+Adds **Message** to **Log**. Added Messages are not written until the method **write()** is called. The **message** may contain {placeholders} which will be replaced with values from the **context** array. It return **Message**.
 ```php
 $log->info('Hello {name}!', ['name' => 'Dolly!']);
 ```
-#### Write Log Messages
-To process log messages using the loggers you have to call method `write`. Calling `write` also removes all log messages from Log. 
+### write 
 ```php
 write(): void
 ```
+**write()** removes all added Messages and writes them using the associated loggers.
 ```php
 $log->write();
 ```
-#### Add Extra Data
-If logger requires extra data you can add extra data to log message.
+### setData
+```php
+Message->setData(array $data): Message
+```
+**setData()** adds extra data to your Message.
 ```php
 $log->info('Hello Dolly!')->setData(['greeter' => 'Molly']);
 ```
 
 Groups
 ------
-#### Positive Groups 
-Every logger and log message can belong to group(s). When logger belongs to some group(s) then it logs only messages belonging to same group(s).
+### setGroup
+```php
+Logger->setGroup(string $group): Logger
+Message->setGroup(string $group): Message
+```
+**setGroup()** adds Logger to positive group. Every logger and log message can belong to one or more positive group. When logger belongs to some group(s) then it logs only messages belonging to same group(s).
 ```php
 // This logger logs only log messages belonging to 'error' group
 $log->addLogger(function () {
@@ -93,8 +101,13 @@ $log->addLogger(function () {
 $log->info('Some info.');
 $log->warning('Some error.')->setGroup('error');
 ```
-#### Negative Groups 
-Every logger can belong to negative group(s). When logger belongs to some negative group(s) then it doesn't log messages belonging to same group(s).  
+
+### setNegativeGroup
+```php
+Logger->setNegativeGroup(string $group): Logger
+Message->setGroup(string $group): Message
+```
+**setNegativeGroup()** adds Logger to negative group. Every logger can belong to one or more negative group. When logger belongs to some negative group(s) then it doesn't log messages belonging to same group(s).
 ```php
 // This logger doesn't log messages belonging to 'error' group
 $log->addLogger(function () {
@@ -108,7 +121,11 @@ $log->warning('Some error.')->setGroup('error');
 
 Levels
 ------
-Every log message belongs to one of [PSR-3][3] log level. You can configure logger to log only certain log level of messages.
+### setLevel
+```php
+Logger->setLevel(string $level): Logger
+```
+**setLevel()** sets Logger to write only Messages with certain [PSR-3][3] log level.
 ```php
 // This logger logs messages from all groups but only with log level 'info'
 $log->addLogger(function () {
@@ -118,10 +135,11 @@ $log->addLogger(function () {
 
 Silent mode
 -----------
-In silent mode failed loggers don't stop code execution, instead of it these incidents are logged with other loggers and failed loggers are skipped.
+### setSilent
 ```php
 setSilent(bool $silent): void
 ```
+**setSilent()** configures **Log** to skip failed Loggers. In silent mode failed loggers don't stop code execution, instead of it these incidents are logged with other loggers. The default value is **FALSE**.
 ```php
 $log = setSilent(true);
 ```

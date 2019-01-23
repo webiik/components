@@ -12,30 +12,30 @@ Example
 ```php
 $error = new \Webiik\Error\Error();
 ```
-Silent Mode
+
+Silent mode
 -----------
-When Error is not in silent mode it halts code execution on every error and then it displays error message. In silent mode instead of displaying error message a user friendly error page is shown and some errors can be completely ignored.
-  
-#### Activate & Deactivate Silent Mode
+### silent
 ```php
 silent(bool $bool): void
 ```
+**silent()** activates or deactivates silent mode. When Error is not in silent mode it halts code execution on every error and then it displays error message. In silent mode instead of displaying error message a custom error page is shown and some errors can be completely ignored.
 ```php
-$error->silent(true); // active
+$error->silent(true);
 ```
-#### Set Error Page
-Set content to be shown when error occurs in silent mode. 
+### setSilentPageContent 
 ```php
 setSilentPageContent(string $string): void
 ```
+**setSilentPageContent()** sets custom error page to be shown when error occurs in silent mode.
 ```php
 $error->setSilentPageContent('<h1>Ups! Kitten lost!</h1>');
 ```
-#### Set PHP Errors to Ignore
-Set an array of [error constants][3] that will be ignored in silent mode.
+### setSilentIgnoreErrors
 ```php
 setSilentIgnoreErrors(array $arr): void
 ```
+**setSilentIgnoreErrors()** sets an array of [error constants][3] that will be ignored in silent mode - no custom error page will be shown and code execution will not stop.
 ```php
 $error->setSilentIgnoreErrors([
     'E_NOTICE',
@@ -44,26 +44,24 @@ $error->setSilentIgnoreErrors([
     'E_USER_DEPRECATED',
 ]);
 ```
+
 Logging
 -------
-All PHP errors are logged by default.
-
-#### Set Default Log Level
-Set default PSR-3 log level of all PHP errors. 
+### setErrLogDefLevel 
 ```php
 setErrLogDefLevel(string $level): void
 ```
-```php
-// All PHP errors will be logged with log level 'error' 
+**setErrLogDefLevel()** associates PSR-3 log level to all PHP error constant. The default value is _warning_.
+```php 
 $error->setErrLogDefLevel('error');
 ```
-> Note: Please keep on mind that [PHP error constant][3] (eg. E_NOTICE) and [PSR-3 log level][4] (eg. notice) are two different things and there is no equal between them. 
+> Note: Please keep on mind that [PHP error constant][3] (eg. E_NOTICE) and [PSR-3 log level][4] (eg. notice) are two different things and there is no connection between them. 
 
-#### Set Custom Log Level
-You can set that some of PHP errors will be logged with specific PSR-3 log level.
+### setErrLogLevel
 ```php
 setErrLogLevel(array $assocArr): void
 ```
+**setErrLogLevel()** associates PSR-3 log level to specific PHP error constant. Default values are shown in the example below.
 ```php
 $error->setErrLogLevel([
     'Exception' => 'error',
@@ -71,11 +69,11 @@ $error->setErrLogLevel([
 ]);
 ```
 
-#### Set Custom Logger
-Set custom log function for logging errors. Function is injected with the following parameters: `string $level`, `string $message`, `array $data`
+### setLogService
 ```php
 setLogService(callable $function): void
 ```
+**setLogService()** sets custom logger logging errors. **function** is injected with the following parameters: **string $level, string $message, array $data**. By default all PHP errors are logged with **error_log()**.
 ```php
 $error->setLogService(function ($level, $message, $data) {
     // $level - PSR-3 log level
