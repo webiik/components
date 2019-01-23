@@ -128,16 +128,6 @@ class Session
     }
 
     /**
-     * Set max time on how long will be session stored in the browser
-     * Default value is set to 0, it means till browser is closed
-     * @param int $sec
-     */
-    public function setSessionCookieLifetime(int $sec): void
-    {
-        $this->sessionCookieLifetime = $sec;
-    }
-
-    /**
      * @param int $sessionGcProbability
      */
     public function setSessionGcProbability(int $sessionGcProbability): void
@@ -154,7 +144,7 @@ class Session
     }
 
     /**
-     * Set max time on how long will be an unused PHP session kept alive
+     * Set max time specifies the number of seconds after which session will be seen as 'garbage' and may be deleted.
      * Default value is set to 1440
      * @param int $sec
      */
@@ -278,7 +268,7 @@ class Session
      * Delete value from session
      * @param string $key
      */
-    public function delFromSession(string $key)
+    public function delFromSession(string $key): void
     {
         $this->sessionStart();
         $_SESSION[$key] = '';
@@ -288,7 +278,7 @@ class Session
     /**
      * Delete all values in session
      */
-    public function dellAllFromSession()
+    public function dellAllFromSession(): void
     {
         $this->sessionStart();
         $_SESSION = [];
@@ -296,23 +286,13 @@ class Session
 
     /**
      * Delete session
-     * @return bool
      */
-    public function sessionDestroy(): bool
+    public function sessionDestroy(): void
     {
         $this->sessionStart();
         $this->dellAllFromSession();
-        setcookie(
-            session_name(),
-            '',
-            0,
-            $this->uri ? $this->uri : '',
-            $this->domain ? $this->domain : '',
-            $this->secure ? $this->secure : false,
-            $this->httpOnly ? $this->httpOnly : false
-        );
+        session_destroy();
         unset($_COOKIE[session_name()]);
-        return session_destroy();
     }
 
     /**
