@@ -11,9 +11,9 @@ class Route
     private $name = '';
 
     /**
-     * @var string
+     * @var array
      */
-    private $regex = '';
+    private $regex = [];
 
     /**
      * @var bool
@@ -66,7 +66,7 @@ class Route
     /**
      * Route constructor.
      * @param array $httpMethods
-     * @param string $regex
+     * @param array $regex
      * @param string $controller
      * @param string $name
      * @param string $lang
@@ -78,7 +78,7 @@ class Route
      */
     public function __construct(
         array $httpMethods,
-        string $regex,
+        array $regex,
         string $controller,
         string $name,
         string $lang,
@@ -109,11 +109,17 @@ class Route
     }
 
     /**
+     * @param string $lang
      * @return string
      */
-    public function getRegex(): string
+    public function getRegex(string $lang = ''): string
     {
-        return $this->regex;
+        if ($lang) {
+            $regex = isset($this->regex[$lang]) ? $this->regex[$lang] : '';
+        } else {
+            $regex = $this->regex[$this->lang];
+        }
+        return $regex;
     }
 
     /**
@@ -173,11 +179,12 @@ class Route
      * Get route regex parameters
      * [int parameterPosition => string parameterRegex], ...
      * e.g. ['0' => '(?<name>[a-z]*)?', '1' => '([a-z]*)']
+     * @param string $lang
      * @return array
      */
-    public function getRegexParameters(): array
+    public function getRegexParameters(string $lang = ''): array
     {
-        preg_match_all('~\(.+?\)\??~', $this->getRegex(), $matches);
+        preg_match_all('~\(.+?\)\??~', $this->getRegex($lang), $matches);
         return $matches ? $matches[0] : [];
     }
 
@@ -195,17 +202,18 @@ class Route
     /**
      * Get URI of this route
      * @param array $parameters Array with parameter values
+     * @param string $lang
      * @return string
      */
-    public function getURI(array $parameters = []): string
+    public function getURI(array $parameters = [], string $lang = ''): string
     {
         // If $parameters are empty use injected parameters instead
-        $parameters = $parameters ? $parameters: $this->parameters;
+        $parameters = $parameters ? $parameters : $this->parameters;
 
         // Reset missing route parameters before every getURI call
         $this->missingParameters = [];
 
-        // Removed named parameters
+        // Remove named parameters
         $parameters = $this->reduceParameters($parameters);
 
         $paramPos = 0;
@@ -236,7 +244,7 @@ class Route
             $paramPos++;
 
             return $replacement . $slash;
-        }, $this->getRegex());
+        }, $this->getRegex($lang));
 
         if ($this->missingParameters || !$URI) {
             // If URI parameters are missing, return empty URI
@@ -252,11 +260,12 @@ class Route
     /**
      * Get URL of this route
      * @param array $parameters
+     * @param string $lang
      * @return string
      */
-    public function getURL(array $parameters = []): string
+    public function getURL(array $parameters = [], string $lang = ''): string
     {
-        return $this->server . $this->getURI($parameters);
+        return $this->server . $this->getURI($parameters, $lang);
     }
 
     /**
