@@ -150,7 +150,7 @@ class Log
     }
 
     /**
-     * Create and store LogMessage
+     * Create and store Message
      *
      * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md#5-psrlogloglevel
      *
