@@ -26,10 +26,10 @@ class Login
     private $session;
 
     /**
-     * Login session name
+     * Login session key
      * @var string
      */
-    private $sessionName = 'logged';
+    private $sessionKey = 'logged';
 
     /**
      * User id from last login check using methods: isLogged. isAuthorised
@@ -86,7 +86,7 @@ class Login
      *
      * @var int
      */
-    private $permanentLoginTime = 0;
+    private $permanentLoginTime = 30 * 24 * 60 * 60;
 
     /**
      * @param Token $token
@@ -125,11 +125,11 @@ class Login
     }
 
     /**
-     * @param string $sessionName
+     * @param string $sessionKey
      */
-    public function setSessionName(string $sessionName): void
+    public function setSessionKey(string $sessionKey): void
     {
-        $this->sessionName = $sessionName;
+        $this->sessionKey = $sessionKey;
     }
 
     /**
@@ -144,7 +144,7 @@ class Login
     public function setLoginSection(string $name): void
     {
         $name = strtolower($name);
-        $this->sessionName .= '_' . $name;
+        $this->sessionKey .= '_' . $name;
         $this->permanentCookieName .= '_' . $name;
     }
 
@@ -174,7 +174,7 @@ class Login
     public function login($uid, bool $permanent = false, string $role = ''): void
     {
         $this->session->sessionRegenerateId();
-        $this->session->setToSession($this->sessionName, [
+        $this->session->setToSession($this->sessionKey, [
             'uid' => $uid,
             'role' => $role,
             'ts' => $_SERVER['REQUEST_TIME'],
@@ -207,8 +207,8 @@ class Login
         $isLogged = false;
 
         // Try to get login session
-        if ($this->session->isInSession($this->sessionName)) {
-            $loginSession = $this->session->getFromSession($this->sessionName);
+        if ($this->session->isInSession($this->sessionKey)) {
+            $loginSession = $this->session->getFromSession($this->sessionKey);
             $this->setLoginCheckCredentials($loginSession['uid'], $loginSession['role']);
             $isLogged = true;
         }
@@ -267,7 +267,7 @@ class Login
             return false;
         }
 
-        $loginSession = $this->session->getFromSession($this->sessionName);
+        $loginSession = $this->session->getFromSession($this->sessionKey);
 
         // Check if user have required role
         if ($loginSession['role'] != $role) {
@@ -295,7 +295,7 @@ class Login
     public function logout(): void
     {
         // Delete login session
-        $this->session->delFromSession($this->sessionName);
+        $this->session->delFromSession($this->sessionKey);
 
         // Delete permanent login cookie and identifier
         if ($this->permanentLoginStorage && $this->cookie->isCookie($this->permanentCookieName)) {
@@ -337,8 +337,8 @@ class Login
     public function updateAutoLogoutTs(): void
     {
         if (!$this->autoLogoutTsUpdated) { // save resources and prevent repeated update
-            if (session_status() != PHP_SESSION_NONE && $this->session->isInSession($this->sessionName)) {
-                $_SESSION[$this->sessionName]['ts'] = $_SERVER['REQUEST_TIME'];
+            if (session_status() != PHP_SESSION_NONE && $this->session->isInSession($this->sessionKey)) {
+                $_SESSION[$this->sessionKey]['ts'] = $_SERVER['REQUEST_TIME'];
                 $this->autoLogoutTsUpdated = true;
             }
         }
