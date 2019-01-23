@@ -33,13 +33,13 @@ class Router
 
     /**
      * HTTP code, it is changed when route matches
-     * Possible codes: 200, 404, 403
+     * Possible codes: 200, 404, 405
      * @var int
      */
     private $httpCode = 404;
 
     /**
-     * Set base directory of your app relative to server root
+     * Set the base directory of your index.php file relatively to web-server root
      * @param string $baseURI
      */
     public function setBaseURI(string $baseURI): void
@@ -48,10 +48,28 @@ class Router
     }
 
     /**
+     * Set default route language
+     * @param string $defaultLang
+     */
+    public function setDefaultLang(string $defaultLang): void
+    {
+        $this->defaultLang = $defaultLang;
+    }
+
+    /**
+     * Determine if default language is part of URI e.g. /en/
+     * @param bool $defaultLangInURI
+     */
+    public function setDefaultLangInURI(bool $defaultLangInURI): void
+    {
+        $this->defaultLangInURI = $defaultLangInURI;
+    }
+
+    /**
      * Return base URL of the app
      * @return string
      */
-    public function getBaseURL()
+    public function getBaseURL(): string
     {
         return $this->getServer() . $this->baseURI;
     }
@@ -121,12 +139,10 @@ class Router
 
         foreach ($this->routes[$lang] as $route) {
             /** @var NewRoute $route */
-            $routeRegex = $route->regex;
-
-            preg_match($routeRegex, $requestURI, $match);
+            preg_match($route->regex, $requestURI, $match);
             if ($match) {
                 // Determine HTTP code by HTTP method
-                $this->httpCode = 403;
+                $this->httpCode = 405;
                 foreach ($route->httpMethods as $httpMethod) {
                     if ($requestMethod == strtolower($httpMethod)) {
                         $this->httpCode = 200;
@@ -134,14 +150,27 @@ class Router
                     }
                 }
 
+                // Don't create Route if HTTP code is not 200
+                if ($this->httpCode != 200) {
+                    break;
+                }
+
                 // Get route parameters
                 unset($match[0]);
                 $parameters = $match;
 
+                // Get route regex fot all lang version
+                $regex[$route->lang] = $route->regex;
+                foreach ($this->routeLangs as $lang => $val) {
+                    if (isset($this->routes[$lang][$route->name])) {
+                        $regex[$lang] = $this->routes[$lang][$route->name]->regex;
+                    }
+                }
+
                 // Create matched route
                 $route = new Route(
                     $route->httpMethods,
-                    $route->regex,
+                    $regex,
                     $route->controller,
                     $route->name,
                     $route->lang,
@@ -163,9 +192,9 @@ class Router
      * Get http code of the result of last call of method match
      *
      * Possible values:
-     * 404 - page not found
-     * 403 - unsupported method
-     * 200 - ok
+     * 404 - Not Found
+     * 405 - Method Not Allowed
+     * 200 - OK
      *
      * @return int
      */
