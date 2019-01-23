@@ -11,7 +11,7 @@ Example
 -------
 ```php
 $dataContainer = new \Webiik\Data\Data();
-$dataContainer->set('key', 'val');
+$dataContainer->set('foo', 'bar');
 ```
 
 Adding
@@ -20,20 +20,20 @@ Adding
 ```php
 set(string $key, $data): void
 ```
-**set()** sets an item to the container with given **$key**.
+**set()** sets **$data** to the container under given **$key**.
 ```php
-$dataContainer->set('key', '$val');
+$dataContainer->set('foo', 'bar');
 ```
 
-Checking
---------
+Check
+-----
 ### isIn
 ```php
 isIn(string $key): bool
 ```
-**isIn()** checks the container for the item with given **$key**. If the item is found, it returns **true**. 
+**isIn()** determines if **$key** is set in container and if its value is not **NULL**. 
 ```php
-$dataContainer->isIn('key');
+$dataContainer->isIn('foo');
 ```
 
 Getting
@@ -42,16 +42,16 @@ Getting
 ```php
 get(string $key)
 ```
-**get()** gets the item from the container by given **$key**.
+**get()** gets data from the container by **$key**.
 ```php
-$dataContainer->get('key');
+$dataContainer->get('foo');
 ```
 
 ### getAll
 ```php
 getAll(): array
 ```
-**getAll()** returns key-value array with all items stored in the container.
+**getAll()** returns key-value array with all data stored in the container.
 ```php
 $dataContainer->getAll();
 ```
