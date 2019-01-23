@@ -82,7 +82,7 @@ class Flash
      */
     public function getFlashes(): array
     {
-        return isset($this->messages[$this->lang]) ? $this->messages[$this->lang] : [];
+        return isset($this->messages[$this->lang], $this->messages[$this->lang]['now']) ? $this->messages[$this->lang]['now'] : [];
     }
 
     /**
