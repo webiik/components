@@ -1,8 +1,8 @@
 {
-  "name": "webiik/token",
+  "name": "webiik/flash",
   "type": "library",
-  "description": "The Token generates and compares tokens.",
-  "keywords": ["token"],
+  "description": "The Flash provides multilingual flash notifications.",
+  "keywords": ["flash", "messages", "notifications"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
   "authors": [
@@ -12,11 +12,12 @@
     }
   ],
   "require": {
-    "php": ">=7.2"
+    "php": ">=7.2",
+    "webiik/session": "^1"
   },
   "autoload": {
     "psr-4": {
-      "Webiik\\Token\\": ""
+      "Webiik\\Flash\\": ""
     },
     "exclude-from-classmap": [
       "/Tests/"
