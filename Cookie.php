@@ -108,9 +108,9 @@ class Cookie
     /**
      * Return cookie value or false if cookie does not exist
      * @param string $name
-     * @return mixed
+     * @return string
      */
-    public function getCookie(string $name)
+    public function getCookie(string $name): string
     {
         return $_COOKIE[$name];
     }
