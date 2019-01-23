@@ -19,37 +19,17 @@ $array = $container->get('\Webiik\Array\Array');
 
 Adding
 ------
-#### Add Service
-Always same instance of service will be returned.
+### addService
 ```php
 addService(string $name, callable $factory): void
 ```
-> `$factory` must always return object
+**addService()** ads service factory to container. It returns always same instance of service. 
 ```php
 $container->addService('\Webiik\Array\Array', function () {
     return new \Webiik\Array\Array();
 });
 ```
-#### Add Service Factory
-Always new instance of service will be returned.
-```php
-addServiceFactory(string $name, callable $factory): void
-```
-> `$factory` must always return object
-#### Add Parameter
-```php
-addParam(string $name, $val): void
-```
-#### Add Function
-```php
-addFunction(string $name, callable $function): void
-```
-```php
-$container->addFunction('myFn', function ($a, $b) {
-    return $a * $b;
-});
-```
-#### Access Container Within Callable
+If you need to access container inside **$factory**:
 ```php
 $container->addService('Service', function ($pimple) use ($container) {
     // $container - Container
@@ -57,30 +37,64 @@ $container->addService('Service', function ($pimple) use ($container) {
 });
 ```
 
-Getting
--------
-#### Get
-Get service, parameter or function from container.
+### addServiceFactory
 ```php
-get(string $name)
+addServiceFactory(string $name, callable $factory): void
 ```
+**addServiceFactory()** ads service factory to container. It returns always new instance of service.
 ```php
-$array = $container->get('\Webiik\Array\Array');
+$container->addService('\Webiik\Array\Array', function () {
+    return new \Webiik\Array\Array();
+});
 ```
-#### Check
-Check if service, parameter or function is stored in container. 
+
+### addParam
+```php
+addParam(string $name, $val): void
+```
+**addParam()** ads parameter to container.
+```php
+$container->addParam('foo', 'bar');
+```
+
+### addFunction
+```php
+addFunction(string $name, callable $function): void
+```
+**addFunction()** ads function to container.
+```php
+$container->addFunction('myFn', function ($a, $b) {
+    return $a * $b;
+});
+```
+
+Check
+-----
+### isIn 
 ```php
 isIn(string $name): bool
 ```
+**isIn()** checks if service, parameter or function is stored in container.
 ```php
 $container->isIn('\Webiik\Array\Array');
+```
+
+Getting
+-------
+### get
+```php
+get(string $name)
+```
+**get()** returns service, parameter or function from container.
+```php
+$array = $container->get('\Webiik\Array\Array');
 ```
 
 Dependency Injection
 --------------------
 Container provides automatic dependency injection from Container to class controller using the method `injectTo(string $className): array`. However it requires to follow these naming conventions:
  
-#### Inject Service by Class Name
+### Inject Service by Class Name
 1. Add service with same name as full name of underlying class:
    ```php
    $container->addService('\Webiik\Array\Array', function () {
@@ -95,12 +109,12 @@ Container provides automatic dependency injection from Container to class contro
    }
    ```
    > Container will search for service with name `\Webiik\Array\Array`. 
-3. Inject dependencies:
+3. Inject dependencies to class:
    ```php
    $myClass = new MyClass(...$container->injectTo('MyClass'));
    ```
 
-#### Inject Service by Service Name
+### Inject Service by Service Name
 1. Add service with name matching the following regex `/ws[A-Z]/`:
    ```php
    $container->addService('wsArray', function () {
@@ -126,7 +140,7 @@ Container provides automatic dependency injection from Container to class contro
    ```php
    $myClass = new MyClass(...$container->injectTo('MyClass'));
 
-#### Inject Function
+### Inject Function or Parameter
 1. Add parameter with any name:
    ```php
    $container->addFunction('myFnName', function() {
@@ -144,25 +158,7 @@ Container provides automatic dependency injection from Container to class contro
 3. Inject dependencies:
    ```php
    $myClass = new MyClass(...$container->injectTo('MyClass'));
-   ```
-   
-#### Inject Parameter
-1. Add parameter with any name:
-   ```php
-   $container->addParam('myParamName', 'Hello!');
-   ```
-2. Use parameter name in controller in your class:
-   ```php   
-   public function __construct($myParamName)
-   {
-       echo $myParamName; // Hello
-   }
-   ```
-   > Container will search for parameter with name `myParamName`. 
-3. Inject dependencies:
-   ```php
-   $myClass = new MyClass(...$container->injectTo('MyClass'));
-   ```   
+   ```  
 
 Resources
 ---------
