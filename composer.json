@@ -1,7 +1,7 @@
 {
   "name": "webiik/router",
   "type": "library",
-  "description": "The Router is passive, multilingual router that supports route names, route parameters, route controllers and middleware.",
+  "description": "The Router is passive, multi-lingual regex router. It supports route names, route parameters, route controllers and route middleware.",
   "keywords": ["router", "route", "routing"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
