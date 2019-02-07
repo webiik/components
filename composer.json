@@ -22,7 +22,8 @@
     "phpmetrics/phpmetrics": "^2",
     "phpmailer/phpmailer": "^6.0",
     "swiftmailer/swiftmailer": "^6.0",
-    "pimple/pimple": "^3"
+    "pimple/pimple": "^3",
+    "twig/twig": "^2"
   },
   "autoload": {
     "psr-4": {
