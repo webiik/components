@@ -69,9 +69,15 @@ class Translation
     /**
      * Add translations
      *
-     * Note:
-     * New value that is not an array, replaces old value.
-     * New value that is an array, is merged with old value.
+     * Note about resolving the key conflicts:
+     *
+     * Arrays values
+     * New value that is an array is merged with old value that is an array.
+     * If array key is a string, value of the new key replaces value of the old key.
+     *
+     * Mixed values
+     * New value that is a different type than old value, replaces old value.
+     * e.g. New string value replaces old array value and vice-versa.
      *
      * @param array $translation
      * @param bool $context
@@ -95,8 +101,14 @@ class Translation
                     $context[$ikey] = [];
                 }
                 $this->addArr($val, $context[$ikey]);
-            } else {
+            } elseif (is_string($ikey)) {
+                // If key is a string, it means it comes from associative array and
+                // its value will be updated with new value.
                 $context[$ikey] = $val;
+            } else {
+                // If key is not a string, it means it comes from sequential array and
+                // its value will be added to that array.
+                $context[] = $val;
             }
         }
     }
