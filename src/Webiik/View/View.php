@@ -21,7 +21,7 @@ class View
      * Get object of underlying template engine
      * @return object
      */
-    public function getRendererCore()
+    public function getTemplateEngine()
     {
         return $this->getRenderer()->core();
     }
