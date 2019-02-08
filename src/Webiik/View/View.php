@@ -8,7 +8,7 @@ use Webiik\View\Renderer\RendererInterface;
 class View
 {
     /**
-     * @var
+     * @var callable|RendererInterface
      */
     private $renderer;
 

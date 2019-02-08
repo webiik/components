@@ -31,7 +31,7 @@ class IntValMin implements RuleInterface
      */
     public function isInputOk($input): bool
     {
-        return $input >= $this->min ? true : false;
+        return $input >= $this->min;
     }
 
     /**

@@ -8,7 +8,7 @@ interface ParserInterface
     /**
      * @param string|int $varValue
      * @param string $parserString
-     * @return string
+     * @return string|int
      */
-    public function parse($varValue, string $parserString): string;
+    public function parse($varValue, string $parserString);
 }

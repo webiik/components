@@ -31,7 +31,7 @@ class IntValMax implements RuleInterface
      */
     public function isInputOk($input): bool
     {
-        return $input <= $this->max ? true : false;
+        return $input <= $this->max;
     }
 
     /**

@@ -32,7 +32,7 @@ class StrLenMin implements RuleInterface
     public function isInputOk($input): bool
     {
         $inputLength = mb_strlen($input);
-        return $inputLength >= $this->min ? true : false;
+        return $inputLength >= $this->min;
     }
 
     /**

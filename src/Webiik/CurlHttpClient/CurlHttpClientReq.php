@@ -458,7 +458,7 @@ class CurlHttpClientReq
     /**
      * @link http://php.net/manual/en/function.curl-setopt.php
      * @param int $option
-     * @param $val
+     * @param mixed $val
      * @return CurlHttpClientReq
      */
     public function curlOption(int $option, $val): CurlHttpClientReq

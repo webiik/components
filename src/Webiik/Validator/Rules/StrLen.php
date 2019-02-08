@@ -39,7 +39,7 @@ class StrLen implements RuleInterface
     public function isInputOk($input): bool
     {
         $inputLength = mb_strlen($input);
-        return $inputLength >= $this->min && $inputLength <= $this->max ? true : false;
+        return $inputLength >= $this->min && $inputLength <= $this->max;
     }
 
     /**
