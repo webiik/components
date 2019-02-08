@@ -12,8 +12,7 @@ class CurlHttpClient
      */
     public function prepareRequest(string $url): CurlHttpClientReq
     {
-        $req = new CurlHttpClientReq($url);
-        return $req;
+        return new CurlHttpClientReq($url);
     }
 
     /**
