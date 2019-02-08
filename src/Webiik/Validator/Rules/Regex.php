@@ -19,7 +19,7 @@ class Regex implements RuleInterface
      * @param string $regex
      * @param string $errMsg
      */
-    public function __construct(string $regex, string $errMsg)
+    public function __construct(string $regex, string $errMsg = '')
     {
         $this->regex = $regex;
         $this->errMsg = $errMsg;

@@ -19,7 +19,7 @@ class Equal implements RuleInterface
      * @param mixed $val
      * @param string $errMsg
      */
-    public function __construct($val, $errMsg)
+    public function __construct($val, string $errMsg = '')
     {
         $this->val = $val;
         $this->errMsg = $errMsg;

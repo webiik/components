@@ -13,7 +13,7 @@ class IsEmail implements RuleInterface
     /**
      * @param string $errMsg
      */
-    public function __construct(string $errMsg)
+    public function __construct(string $errMsg = '')
     {
         $this->errMsg = $errMsg;
     }
