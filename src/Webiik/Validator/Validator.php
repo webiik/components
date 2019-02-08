@@ -13,7 +13,7 @@ class Validator
     private $inputs = [];
 
     /**
-     * Add input to an array of inputs for validation
+     * Add an input to an array of inputs for validation
      * @param mixed $input Input value to validate
      * @param callable $rules MUST return array of RuleInterface implementations
      * @param string $name Input name
