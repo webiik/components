@@ -12,7 +12,8 @@
     }
   ],
   "require": {
-    "php": ">=7.2"
+    "php": ">=7.2",
+    "webiik/arr": "^1"
   },
   "autoload": {
     "psr-4": {
