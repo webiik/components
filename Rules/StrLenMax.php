@@ -32,7 +32,7 @@ class StrLenMax implements RuleInterface
     public function isInputOk($input): bool
     {
         $inputLength = mb_strlen($input);
-        return $inputLength <= $this->max ? true : false;
+        return $inputLength <= $this->max;
     }
 
     /**

@@ -6,7 +6,7 @@ namespace Webiik\Validator\Rules;
 class Equal implements RuleInterface
 {
     /**
-     * @var
+     * @var mixed
      */
     private $val;
 
@@ -31,7 +31,7 @@ class Equal implements RuleInterface
      */
     public function isInputOk($input): bool
     {
-        return $input === $this->val ? true : false;
+        return $input === $this->val;
     }
 
     /**

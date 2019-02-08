@@ -38,7 +38,7 @@ class IntVal implements RuleInterface
      */
     public function isInputOk($input): bool
     {
-        return $input >= $this->min && $input <= $this->max ? true : false;
+        return $input >= $this->min && $input <= $this->max;
     }
 
     /**
