@@ -14,32 +14,32 @@ class Database
      * @param string $name
      * @param string $driver
      * @param string $host
-     * @param string $nameDB
+     * @param string $databaseName
      * @param string $user
      * @param string $password
      * @param array $options
-     * @param array $execute
+     * @param array $commands
      */
     public function add(
         string $name,
         string $driver,
         string $host,
-        string $nameDB,
+        string $databaseName,
         string $user,
         string $password,
         array $options = [],
-        array $execute = []
+        array $commands = []
     ): void {
         $this->database[$name] = [
             'config' => [
                 $driver,
                 $host,
-                $nameDB,
+                $databaseName,
                 $user,
                 $password,
                 $options,
             ],
-            'exec' => $execute,
+            'exec' => $commands,
             'pdo' => null,
         ];
     }
