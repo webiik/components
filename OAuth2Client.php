@@ -117,7 +117,7 @@ class OAuth2Client
     /**
      * Return authorization URL
      *
-     * Available response types:
+     * Possible response types:
      * code - grant: Authorization Code. Response will include an authorization code.
      * token - grant: Implicit. Response will include an Access Token.
      * id_token token - grant: Implicit. Response will include an Access Token and an ID Token.
