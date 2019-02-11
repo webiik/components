@@ -111,7 +111,7 @@ class OAuth1Client
     /**
      * @param string $secret
      */
-    public function setSignatureSecret($secret): void
+    public function setSignatureSecret(string $secret): void
     {
         $this->oauth_signature_secret = $secret;
     }
@@ -149,29 +149,14 @@ class OAuth1Client
     }
 
     /**
-     * Return array with response from OAuth provider e.g. 'oauth_token' and other data if provided
-     * On cURL error return cURL error message
-     * @return array|string
+     * Return authorize URL with filled request token
+     * @return string
      */
-    public function getRequestToken()
+    public function getAuthorizeUrl(): string
     {
-        // Prepare OAuth HTTP header
-        $data = $this->prepareData();
-        $data = $this->addSignature($data, $this->oauth_request_token_url);
-        $headers = $this->prepareAuthHeader($data);
-
-        // Send HTTP request and get request_token
-        $req = $this->curlHttpClient->prepareRequest($this->oauth_request_token_url);
-        $req->method('POST');
-        $req->headers($headers);
-        $res = $this->curlHttpClient->send($req);
-
-        if ($res->isOk()) {
-            parse_str($res->body(), $body);
-            return $body;
-        }
-
-        return $res->errMessage();
+        $requestToken = $this->getRequestToken();
+        $requestToken = is_string($requestToken) ? $requestToken : $requestToken['oauth_token'];
+        return $this->oauth_authorize_url . '?oauth_token=' . urlencode($requestToken);
     }
 
     /**
@@ -206,13 +191,29 @@ class OAuth1Client
     }
 
     /**
-     * Return authorize URL with filled request token
-     * @param string $requestToken
-     * @return string
+     * Return array with response from OAuth provider e.g. 'oauth_token' and other data if provided
+     * On cURL error return cURL error message
+     * @return array|string
      */
-    public function getAuthorizeUrl($requestToken): string
+    private function getRequestToken()
     {
-        return $this->oauth_authorize_url . '?oauth_token=' . urlencode($requestToken);
+        // Prepare OAuth HTTP header
+        $data = $this->prepareData();
+        $data = $this->addSignature($data, $this->oauth_request_token_url);
+        $headers = $this->prepareAuthHeader($data);
+
+        // Send HTTP request and get request_token
+        $req = $this->curlHttpClient->prepareRequest($this->oauth_request_token_url);
+        $req->method('POST');
+        $req->headers($headers);
+        $res = $this->curlHttpClient->send($req);
+
+        if ($res->isOk()) {
+            parse_str($res->body(), $body);
+            return $body;
+        }
+
+        return $res->errMessage();
     }
 
     /**
