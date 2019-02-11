@@ -63,20 +63,6 @@ class CurlHttpClientReq
     }
 
     /**
-     * Set response decoding
-     * Supported encodings are "identity", "deflate", and "gzip".
-     * If an empty string, "", is set, a header containing all
-     * supported encoding types is sent.
-     * @param string $encoding
-     * @return CurlHttpClientReq
-     */
-    public function encoding(string $encoding): CurlHttpClientReq
-    {
-        $this->curlOptions[CURLOPT_ENCODING] = $encoding;
-        return $this;
-    }
-
-    /**
      * Set to follow redirects
      * @param bool $follow
      * @param int $maxRedirs
@@ -107,19 +93,19 @@ class CurlHttpClientReq
 
     /**
      * Set proxy to connect through
-     * @param string $proxy
+     * @param string $proxyUrl
      * @param string $user
      * @param string $password
      * @param int $authMethod
      * @return CurlHttpClientReq
      */
     public function proxy(
-        string $proxy,
+        string $proxyUrl,
         string $user = '',
         string $password = '',
         int $authMethod = CURLAUTH_BASIC
     ): CurlHttpClientReq {
-        $this->curlOptions[CURLOPT_PROXY] = $proxy;
+        $this->curlOptions[CURLOPT_PROXY] = $proxyUrl;
         $this->curlOptions[CURLOPT_PROXYAUTH] = $authMethod;
         if ($user && $password) {
             $this->curlOptions[CURLOPT_PROXYUSERPWD] = $user . ':' . $password;
@@ -265,7 +251,7 @@ class CurlHttpClientReq
     }
 
     /**
-     * Set to curl to ignore all previous cookies
+     * Set curl to ignore all previous cookies
      * @return CurlHttpClientReq
      */
     public function resetCookie(): CurlHttpClientReq
@@ -337,6 +323,20 @@ class CurlHttpClientReq
     }
 
     // Data to receive
+
+    /**
+     * Set response decoding
+     * Supported encodings are "identity", "deflate", and "gzip".
+     * If an empty string, "", is set, a header containing all
+     * supported encoding types is sent.
+     * @param string $encoding
+     * @return CurlHttpClientReq
+     */
+    public function encoding(string $encoding): CurlHttpClientReq
+    {
+        $this->curlOptions[CURLOPT_ENCODING] = $encoding;
+        return $this;
+    }
 
     /**
      * Determine to receive response body or not
