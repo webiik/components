@@ -7,6 +7,12 @@ Middleware
 ==========
 The Middleware is middleware launcher that allows automatic constructor DI and sending custom data among middleware. 
 
+Installation
+------------
+```bash
+composer require webiik/middleware
+```
+
 Example
 -------
 ```php
@@ -69,6 +75,7 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
-[3]: https://github.com/webiik/webiik/blob/master/src/Webiik/Container/README.md
-[4]: https://github.com/webiik/webiik/blob/master/src/Webiik/Data/README.md
+[2]: https://github.com/webiik/webiik/issues
+[3]: ../Container/README.md
+[4]: ../Data/README.md
+

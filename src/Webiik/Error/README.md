@@ -7,6 +7,12 @@ Error
 =====
 The Error provides more control over displaying and logging PHP errors.
 
+Installation
+------------
+```bash
+composer require webiik/error
+```
+
 Example
 ------- 
 ```php
@@ -89,6 +95,6 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
 [3]: http://php.net/manual/en/errorfunc.constants.php
 [4]: https://www.php-fig.org/psr/psr-3/

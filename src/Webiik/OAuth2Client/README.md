@@ -7,6 +7,12 @@ OAuth2Client
 ============
 The OAuth2Client allows you to connect to any OAuth2 server. Just follow the procedure described in the example below.
 
+Installation
+------------
+```bash
+composer require webiik/oauth2client
+```
+
 Example
 -------
 ```php
@@ -199,4 +205,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues

@@ -7,6 +7,12 @@ View
 ====
 The View provides common interface for rendering templates, no matter what template engine you want to use. Out of the box it supports Twig template engine.
 
+Installation
+------------
+```bash
+composer require webiik/view
+```
+
 Example
 -------
 ```php
@@ -78,4 +84,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues

@@ -7,6 +7,12 @@ Database
 ========
 The Database is PDO connection container.
 
+Installation
+------------
+```bash
+composer require webiik/database
+```
+
 Example
 -------
 ```php
@@ -62,4 +68,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues

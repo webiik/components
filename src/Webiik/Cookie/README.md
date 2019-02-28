@@ -3,14 +3,20 @@
 <img src="https://img.shields.io/badge/dependencies-0-brightgreen.svg"/>
 </p>
 
-Cookies
-=======
+Cookie
+======
 The Cookie provides safe way to work with cookies.
+
+Installation
+------------
+```bash
+composer require webiik/cookie
+```
 
 Example
 -------
 ```php
-$cookie = new Webiik\Cookie\Cookie();
+$cookie = new \Webiik\Cookie\Cookie();
 $cookie->setCookie('foo', 'bar');
 if ($cookie->isCookie('foo')) {
     echo 'Cookie foo has value: ' . $cookie->getCookie('foo');
@@ -115,4 +121,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
