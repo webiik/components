@@ -7,14 +7,20 @@ Container
 =========
 The Container adds handy methods to most common Pimple functions and then adds automatic injection of dependencies from container to class controller.
 
+Installation
+------------
+```bash
+composer require webiik/container
+```
+
 Example
 -------
 ```php
 $container = new \Webiik\Container\Container();
-$container->addService('\Webiik\Array\Array', function () {
-    return new \Webiik\Array\Array();
+$container->addService('\Webiik\Arr\Arr', function () {
+    return new \Webiik\Arr\Arr();
 });
-$array = $container->get('\Webiik\Array\Array');
+$array = $container->get('\Webiik\Arr\Arr');
 ```
 
 Adding
@@ -25,8 +31,8 @@ addService(string $name, callable $factory): void
 ```
 **addService()** ads service factory to container. It returns always same instance of service. 
 ```php
-$container->addService('\Webiik\Array\Array', function () {
-    return new \Webiik\Array\Array();
+$container->addService('\Webiik\Arr\Arr', function () {
+    return new \Webiik\Arr\Arr();
 });
 ```
 If you need to access container inside **$factory**:
@@ -43,8 +49,8 @@ addServiceFactory(string $name, callable $factory): void
 ```
 **addServiceFactory()** ads service factory to container. It returns always new instance of service.
 ```php
-$container->addService('\Webiik\Array\Array', function () {
-    return new \Webiik\Array\Array();
+$container->addService('\Webiik\Arr\Arr', function () {
+    return new \Webiik\Arr\Arr();
 });
 ```
 
@@ -76,7 +82,7 @@ isIn(string $name): bool
 ```
 **isIn()** checks if service, parameter or function is stored in container.
 ```php
-$container->isIn('\Webiik\Array\Array');
+$container->isIn('\Webiik\Arr\Arr');
 ```
 
 Getting
@@ -87,7 +93,7 @@ get(string $name)
 ```
 **get()** returns service, parameter or function from container.
 ```php
-$array = $container->get('\Webiik\Array\Array');
+$array = $container->get('\Webiik\Arr\Arr');
 ```
 
 Dependency Injection
@@ -97,18 +103,18 @@ Container provides automatic dependency injection from Container to class contro
 ### Inject Service by Class Name
 1. Add service with same name as full name of underlying class:
    ```php
-   $container->addService('\Webiik\Array\Array', function () {
-      return new \Webiik\Array\Array();   
+   $container->addService('\Webiik\Arr\Arr', function () {
+      return new \Webiik\Arr\Arr();   
    });
    ```
 2. Use full class name as type parameter in controller in your class:
    ```php   
-   public function __construct(\Webiik\Array\Array $array)
+   public function __construct(\Webiik\Arr\Arr $array)
    {
        $this->array = $array;
    }
    ```
-   > Container will search for service with name `\Webiik\Array\Array`. 
+   > Container will search for service with name `\Webiik\Arr\Arr`. 
 3. Inject dependencies to class:
    ```php
    $myClass = new MyClass(...$container->injectTo('MyClass'));
@@ -118,12 +124,12 @@ Container provides automatic dependency injection from Container to class contro
 1. Add service with name matching the following regex `/ws[A-Z]/`:
    ```php
    $container->addService('wsArray', function () {
-      return new \Webiik\Array\Array();   
+      return new \Webiik\Arr\Arr();   
    });
    ```
 2. Add class name alias to your class:
    ```php
-   use Webiik\Array\Array as wsArray;
+   use Webiik\Arr\Arr as wsArray;
    ```
 3. Add doc block with parameter type to controller of your class:   
    ```php
@@ -167,5 +173,5 @@ Resources
 * [Pimple][3]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
 [3]: https://github.com/silexphp/Pimple  
