@@ -7,6 +7,12 @@ Data
 ====
 The Data is simple, read/write-only, key-value data container.
 
+Installation
+------------
+```bash
+composer require webiik/data
+```
+
 Example
 -------
 ```php
@@ -62,4 +68,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
