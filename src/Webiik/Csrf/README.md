@@ -77,7 +77,7 @@ $csrf->validate($token);
 Resources
 ---------
 * [Webiik framework][1]
-* [Report issues][2]
+* [Report issue][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik/issues
+[2]: https://github.com/webiik/components/issues
