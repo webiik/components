@@ -13,6 +13,12 @@ The Login manages the user login state. It supports:
 
 > **Note:** This class is meant to be used after the successful user authentication and authorization.
 
+Installation
+------------
+```bash
+composer require webiik/login
+```
+
 Example
 -------
 ```php
@@ -201,5 +207,5 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
 [3]: https://github.com/webiik/webiik/blob/master/src/Webiik/Session/README.md
