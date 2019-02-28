@@ -38,6 +38,7 @@
   },
   "require-dev": {
     "swiftmailer/swiftmailer": "^6.0",
+    "phpmailer/phpmailer": "~6.0",
     "pimple/pimple": "^3",
     "twig/twig": "^2",
     "webiik/cli-analyse": "*"
