@@ -32,4 +32,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik/issues
+[2]: https://github.com/webiik/components/issues
