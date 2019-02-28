@@ -7,6 +7,12 @@ Arr
 ===
 The Arr provides dot notation for PHP arrays.
 
+Installation
+------------
+```bash
+composer require webiik/arr
+```
+
 Example
 -------
 ```php
@@ -74,4 +80,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
