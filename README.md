@@ -7,6 +7,12 @@ Log
 ===
 The Log provides simple solution for advanced logging.
 
+Installation
+------------
+```bash
+composer require webiik/log
+```
+
 Example
 -------
 ```php
@@ -150,5 +156,5 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
 [3]: https://www.php-fig.org/psr/psr-3/
