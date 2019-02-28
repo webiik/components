@@ -1,0 +1,5 @@
+Tests             export-ignore
+test              export-ignore
+README.md         export-ignore
+.gitattributes    export-ignore
+.gitignore        export-ignore

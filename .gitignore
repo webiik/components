@@ -1,10 +1,6 @@
 .idea
 .DS_Store
-.scannerwork
 composer.lock
 vendor
-analysis/php*
-analysis/sonar
-/view
-/*.php
-/tmp
+test/tmp/*
+!.gitkeep
