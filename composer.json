@@ -1,8 +1,7 @@
 {
-  "name": "webiik/webiik",
-  "type": "library",
-  "description": "Webiik is full-pfelged PHP framework focused on efficiency, simplicity and flexibility.",
-  "keywords": ["framework", "lightweight", "simple", "fast", "easy", "webiik"],
+  "name": "webiik/components",
+  "description": "Webiik components for lean web development with minimal dependencies.",
+  "keywords": ["components", "webiik"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
   "authors": [
@@ -14,20 +13,40 @@
   "require": {
     "php": ">=7.2"
   },
+  "replace": {
+    "webiik/arr": "self.version",
+    "webiik/container": "self.version",
+    "webiik/cookie": "self.version",
+    "webiik/csrf": "self.version",
+    "webiik/curlhttpclient": "self.version",
+    "webiik/data": "self.version",
+    "webiik/database": "self.version",
+    "webiik/error": "self.version",
+    "webiik/flash": "self.version",
+    "webiik/log": "self.version",
+    "webiik/login": "self.version",
+    "webiik/mail": "self.version",
+    "webiik/middleware": "self.version",
+    "webiik/oauth1client": "self.version",
+    "webiik/oauth2client": "self.version",
+    "webiik/router": "self.version",
+    "webiik/session": "self.version",
+    "webiik/token": "self.version",
+    "webiik/translation": "self.version",
+    "webiik/validator": "self.version",
+    "webiik/view": "self.version"
+  },
   "require-dev": {
-    "phpmd/phpmd" : "@stable",
-    "squizlabs/php_codesniffer": "^3",
-    "phpunit/phpunit": "^7",
-    "phpstan/phpstan": "^0.10",
-    "phpmetrics/phpmetrics": "^2",
-    "phpmailer/phpmailer": "^6.0",
     "swiftmailer/swiftmailer": "^6.0",
     "pimple/pimple": "^3",
-    "twig/twig": "^2"
+    "twig/twig": "^2",
+    "webiik/cli-analyse": "*"
   },
   "autoload": {
     "psr-4": {
-      "Webiik\\": "src/Webiik/"
+      "Webiik\\": "src/Webiik"
     }
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
