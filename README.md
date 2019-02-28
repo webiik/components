@@ -1,11 +1,17 @@
 <p align="left">
 <img src="https://img.shields.io/packagist/l/webiik/webiik.svg"/>
-<img src="https://img.shields.io/badge/dependencies-1&#x2D7;2-brightgreen.svg"/>
+<img src="https://img.shields.io/badge/dependencies-0-brightgreen.svg"/>
 </p>
 
 Mail
 ====
 The Mail brings common interface for sending emails, no matter what mail library you want to use. Out of the box it supports PHPMailer and SwiftMailer.
+
+Installation
+------------
+```bash
+composer require webiik/mail
+```
 
 Example
 -------
@@ -226,4 +232,4 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
