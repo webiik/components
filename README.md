@@ -7,6 +7,12 @@ Router
 ======
 The Router is **passive**, multi-lingual regex router. It supports route names, route parameters, route controllers and route middleware. **Passive** means that it doesn't set HTTP headers and it doesn't invoke route controllers and middleware. It just tests a request URI against the defined routes and returns all necessary data to build a route.   
 
+Installation
+------------
+```bash
+composer require webiik/router
+```
+
 Example
 -------
 ```php
@@ -268,5 +274,5 @@ Resources
 * [Report issues][2]
 
 [1]: https://github.com/webiik/webiik
-[2]: https://github.com/webiik/webiik-components/issues
+[2]: https://github.com/webiik/webiik/issues
 [3]: #match
