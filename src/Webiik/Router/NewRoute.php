@@ -68,12 +68,16 @@ class NewRoute
 
     /**
      * Add route middleware in format ClassName:MethodName or ClassName
-     * @param string $className
+     * @param string $controller
+     * @param array $data
      * @return NewRoute
      */
-    public function mw(string $className): NewRoute
+    public function mw(string $controller, $data = []): NewRoute
     {
-        $this->middleware[] = $className;
+        $this->middleware[] = [
+            'controller' => $controller,
+            'data' => $data
+        ];
         return $this;
     }
 }
