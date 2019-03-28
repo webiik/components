@@ -1,0 +1,25 @@
+{
+  "name": "webiik/attempts",
+  "type": "library",
+  "description": "The Attempts provides common interface for user actions monitoring.",
+  "keywords": ["attempts"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\Attempts\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
