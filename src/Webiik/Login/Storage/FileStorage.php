@@ -18,13 +18,6 @@ class FileStorage implements StorageInterface
     private $ext = 'wip';
 
     /**
-     * Delete all permanent files that have been not accessed for given ttl.
-     * This ttl is only used when deleteExpired receives unlimited ttl(0) to prevent filling the storage with garbage.
-     * @var int
-     */
-    private $defaultTtl = 90 * 24 * 60 * 60;
-
-    /**
      * @param string $path
      */
     public function setPath(string $path): void
@@ -41,25 +34,15 @@ class FileStorage implements StorageInterface
     }
 
     /**
-     * @param int $defaultTtl
-     */
-    public function setDefaultTtl(int $defaultTtl): void
-    {
-        $this->defaultTtl = $defaultTtl;
-    }
-
-    /**
      * @param int|string $uid
-     * @param string $role
      * @param string $selector
      * @param string $key
      * @param int $expiration
      */
-    public function store($uid, string $role, string $selector, string $key, int $expiration): void
+    public function store($uid, string $selector, string $key, int $expiration): void
     {
         $data = serialize([
             'uid' => $uid,
-            'role' => $role,
             'selector' => $selector,
             'key' => $key,
             'expiration' => $expiration,
@@ -95,12 +78,24 @@ class FileStorage implements StorageInterface
     }
 
     /**
+     * @param string $selector
+     * @param int $ttl
+     */
+    public function updateExpiration(string $selector, int $ttl): void
+    {
+        $data = $this->get($selector);
+        if (!$data) {
+            return;
+        }
+        $data['expiration'] = (int)($_SERVER['REQUEST_TIME'] + $ttl);
+        $this->store(...$data);
+    }
+
+    /**
      * @param int $ttl
      */
     public function deleteExpired(int $ttl): void
     {
-        $ttl = $ttl ? $ttl : $this->defaultTtl;
-
         foreach (new \DirectoryIterator($this->path) as $item) {
             if ($item->isFile() && $item->getExtension() == $this->ext) {
                 if ($_SERVER['REQUEST_TIME'] - $ttl > $item->getMTime()) {

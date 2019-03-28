@@ -38,19 +38,18 @@ class Login
     private $uid;
 
     /**
-     * User role from last login check using methods: isLogged. isAuthorised
-     * @var string
+     * Logout reason constants
      */
-    private $role;
+    public const MANUAL = 1, AUTO = 2;
 
     /**
-     * All allowed user roles and associated actions e.g. ['user' => ['account-read']]
-     * @var array
+     * Logout reason
+     * @var int
      */
-    private $allowedAuthority = [];
+    private $logoutReason;
 
     /**
-     * Time in sec to auto logout user on inactivity between two requests
+     * Time in minutes to auto logout user on inactivity between two requests
      *
      * Note:
      * Not available for permanent login.
@@ -61,32 +60,22 @@ class Login
     private $autoLogoutTime = 0;
 
     /**
-     * Indicates if auto logout timestamp has been updated during current request
-     * @var bool
-     */
-    private $autoLogoutTsUpdated = false;
-
-    /**
      * Permanent identifier Storage
      * @var StorageInterface|callable|bool
      */
     private $permanentLoginStorage = false;
 
     /**
+     * How many days to keep permanent cookie and identifiers when user is not active
+     * @var int
+     */
+    private $permanentLoginDuration;
+
+    /**
      * Name of permanent login cookie
      * @var string
      */
     private $permanentCookieName = 'PC';
-
-    /**
-     * Time in seconds to keep permanent cookie and identifiers alive
-     *
-     * Note:
-     * 0 - unlimited
-     *
-     * @var int
-     */
-    private $permanentLoginTime = 30 * 24 * 60 * 60;
 
     /**
      * @param Token $token
@@ -102,10 +91,12 @@ class Login
 
     /**
      * @param callable $factory
+     * @param int $days
      */
-    public function setPermanentLoginStorage(callable $factory): void
+    public function setPermanentLoginStorage(callable $factory, int $days = 30): void
     {
         $this->permanentLoginStorage = $factory;
+        $this->permanentLoginDuration = $days;
     }
 
     /**
@@ -119,9 +110,9 @@ class Login
     /**
      * @param int $sec
      */
-    public function setPermanentLoginTime(int $sec): void
+    public function setAutoLogoutTime(int $sec): void
     {
-        $this->permanentLoginTime = $sec;
+        $this->autoLogoutTime = $sec;
     }
 
     /**
@@ -133,15 +124,15 @@ class Login
     }
 
     /**
-     * Resolute login by sections (e.g. lang, app part, ...)
+     * Resolute login by namespace (e.g. lang, app part, ...)
      *
      * Note:
-     * If login section is set then methods login, updateTs, isLogged,
-     * isAuth and logout are valid only for that section.
+     * If login namespace is set then methods login, updateTs, isLogged,
+     * isAuth and logout are valid only for that namespace.
      *
      * @param string $name
      */
-    public function setLoginSection(string $name): void
+    public function setNamespace(string $name): void
     {
         $name = strtolower($name);
         $this->sessionKey .= '_' . $name;
@@ -149,49 +140,29 @@ class Login
     }
 
     /**
-     * @param int $sec
-     */
-    public function setAutoLogoutTime(int $sec): void
-    {
-        $this->autoLogoutTime = $sec;
-    }
-
-    /**
-     * @param string $role
-     * @param array $actions
-     */
-    public function setAllowedAuthority(string $role, array $actions = []): void
-    {
-        $this->allowedAuthority[$role] = $actions;
-    }
-
-    /**
      * Log in the user
      * @param string|int $uid
      * @param bool $permanent
-     * @param string $role
      */
-    public function login($uid, bool $permanent = false, string $role = ''): void
+    public function login($uid, bool $permanent = false): void
     {
         $this->session->sessionRegenerateId();
         $this->session->setToSession($this->sessionKey, [
             'uid' => $uid,
-            'role' => $role,
             'ts' => $_SERVER['REQUEST_TIME'],
         ]);
 
-        if ($permanent) {
+        if ($permanent && $this->permanentLoginStorage) {
             try {
                 $tokens = $this->createPermanentCookie();
                 $this->getStorage()->store(
                     $uid,
-                    $role,
                     $tokens['selector'],
                     hash('sha256', $tokens['key']),
-                    $this->permanentLoginTime ? (int)($_SERVER['REQUEST_TIME'] + $this->permanentLoginTime) : $this->permanentLoginTime
+                    (int)($_SERVER['REQUEST_TIME'] + ($this->permanentLoginDuration * 24 * 60 * 60))
                 );
             } catch (\Exception $exception) {
-                // Permanent login can't be created due to missing tokens.
+                // Can't create permanent login due to missing tokens.
                 // It's not a reason to stop the app. So just ignore it and use
                 // only regular login.
             }
@@ -209,7 +180,7 @@ class Login
         // Try to get login session
         if ($this->session->isInSession($this->sessionKey)) {
             $loginSession = $this->session->getFromSession($this->sessionKey);
-            $this->setLoginCheckCredentials($loginSession['uid'], $loginSession['role']);
+            $this->setLoginCheckCredentials($loginSession['uid']);
             $isLogged = true;
         }
 
@@ -237,9 +208,13 @@ class Login
                 return $isLogged;
             }
 
+            // Update permanent login cookie and identifiers time
+            $this->updatePermanentCookieExpiration();
+            $this->getStorage()->updateExpiration($cookieTokens['selector'], $this->permanentLoginDuration);
+
             // Login the user to avoid repeated permanent login checks and so speed up authentication
-            $this->login($identifierData['uid'], false, $identifierData['role']);
-            $this->setLoginCheckCredentials($identifierData['uid'], $identifierData['role']);
+            $this->login($identifierData['uid'], false);
+            $this->setLoginCheckCredentials($identifierData['uid']);
             $isLogged = true;
         }
 
@@ -247,6 +222,7 @@ class Login
         if ($isLogged && $this->autoLogoutTime && !$this->cookie->isCookie($this->permanentCookieName)) {
             if (isset($loginSession) && $loginSession['ts'] + $this->autoLogoutTime < $_SERVER['REQUEST_TIME']) {
                 $this->logout();
+                $this->logoutReason = self::AUTO;
                 $isLogged = false;
             }
         }
@@ -256,44 +232,13 @@ class Login
     }
 
     /**
-     * Check if user is authorised
-     * @param string $role
-     * @param array $actions
-     * @return bool
-     */
-    public function isAuthorized(string $role, array $actions = []): bool
-    {
-        if (!$this->isLogged()) {
-            return false;
-        }
-
-        $loginSession = $this->session->getFromSession($this->sessionKey);
-
-        // Check if user have required role
-        if ($loginSession['role'] != $role) {
-            return false;
-        }
-
-        // Check if role is available (allowed)
-        if (!isset($this->allowedAuthority[$loginSession['role']])) {
-            return false;
-        }
-
-        // Check if user can do all required actions
-        foreach ($actions as $action) {
-            if (!in_array($action, $this->allowedAuthority[$loginSession['role']])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Log out the user
      */
     public function logout(): void
     {
+        // Set logout reason
+        $this->logoutReason = self::MANUAL;
+
         // Delete login session
         $this->session->delFromSession($this->sessionKey);
 
@@ -308,19 +253,25 @@ class Login
     }
 
     /**
+     * Get logout reason
+     *
+     * Note:
+     * 1 - self::MANUAL
+     * 2 - self::AUTO
+     *
+     * @return int
+     */
+    public function getLogoutReason(): int
+    {
+        return $this->logoutReason;
+    }
+
+    /**
      * @return int|string
      */
     public function getUserId()
     {
         return $this->uid;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUserRole(): string
-    {
-        return $this->role;
     }
 
     /**
@@ -336,11 +287,8 @@ class Login
      */
     public function updateAutoLogoutTs(): void
     {
-        if (!$this->autoLogoutTsUpdated) { // save resources and prevent repeated update
-            if (session_status() != PHP_SESSION_NONE && $this->session->isInSession($this->sessionKey)) {
-                $_SESSION[$this->sessionKey]['ts'] = $_SERVER['REQUEST_TIME'];
-                $this->autoLogoutTsUpdated = true;
-            }
+        if (session_status() != PHP_SESSION_NONE && $this->session->isInSession($this->sessionKey)) {
+            $_SESSION[$this->sessionKey]['ts'] = $_SERVER['REQUEST_TIME'];
         }
     }
 
@@ -366,7 +314,7 @@ class Login
         $max = (int)ini_get('session.gc_divisor');
         $probability = (int)ini_get('session.gc_probability');
         if (mt_rand(1, $max) <= $probability) {
-            $this->getStorage()->deleteExpired($this->permanentLoginTime);
+            $this->getStorage()->deleteExpired($this->permanentLoginDuration * 24 * 60 * 60);
         }
     }
 
@@ -384,9 +332,22 @@ class Login
         $this->cookie->setCookie(
             $this->permanentCookieName,
             $tokens['selector'] . '.' . $tokens['key'],
-            $this->permanentLoginTime ? (int)($_SERVER['REQUEST_TIME'] + $this->permanentLoginTime) : $this->permanentLoginTime
+            (int)($_SERVER['REQUEST_TIME'] + ($this->permanentLoginDuration * 24 * 60 * 60))
         );
         return $tokens;
+    }
+
+    /**
+     * Update expiration of permanent cookie
+     */
+    private function updatePermanentCookieExpiration(): void
+    {
+        $this->cookie->delCookie($this->permanentCookieName);
+        $this->cookie->setCookie(
+            $this->permanentCookieName,
+            $this->cookie->getCookie($this->permanentCookieName),
+            (int)($_SERVER['REQUEST_TIME'] + ($this->permanentLoginDuration * 24 * 60 * 60))
+        );
     }
 
     /**
@@ -395,10 +356,6 @@ class Login
      */
     private function getPermanentCookieTokens(): array
     {
-        if (!$this->cookie->isCookie($this->permanentCookieName)) {
-            return [];
-        }
-
         $cookieVal = $this->cookie->getCookie($this->permanentCookieName);
 
         if (strlen($cookieVal) != 65) {
@@ -417,13 +374,11 @@ class Login
     }
 
     /**
-     * Set user id and user role found during last login check
+     * Set user id found during last login check
      * @param string|int $uid
-     * @param string $role
      */
-    private function setLoginCheckCredentials($uid, string $role)
+    private function setLoginCheckCredentials($uid): void
     {
         $this->uid = $uid;
-        $this->role = $role;
     }
 }
