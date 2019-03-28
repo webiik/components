@@ -13,8 +13,17 @@
   "require": {
     "php": ">=7.2"
   },
+  "require-dev": {
+    "swiftmailer/swiftmailer": "^6.0",
+    "phpmailer/phpmailer": "~6.0",
+    "pimple/pimple": "^3",
+    "twig/twig": "^2",
+    "webiik/cli-analyse": "^1"
+  },
   "replace": {
+    "webiik/account": "self.version",
     "webiik/arr": "self.version",
+    "webiik/attempts": "self.version",
     "webiik/container": "self.version",
     "webiik/cookie": "self.version",
     "webiik/csrf": "self.version",
@@ -29,6 +38,7 @@
     "webiik/middleware": "self.version",
     "webiik/oauth1client": "self.version",
     "webiik/oauth2client": "self.version",
+    "webiik/privileges": "self.version",
     "webiik/router": "self.version",
     "webiik/session": "self.version",
     "webiik/token": "self.version",
@@ -36,18 +46,9 @@
     "webiik/validator": "self.version",
     "webiik/view": "self.version"
   },
-  "require-dev": {
-    "swiftmailer/swiftmailer": "^6.0",
-    "phpmailer/phpmailer": "~6.0",
-    "pimple/pimple": "^3",
-    "twig/twig": "^2",
-    "webiik/cli-analyse": "*"
-  },
   "autoload": {
     "psr-4": {
       "Webiik\\": "src/Webiik"
     }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
 }
