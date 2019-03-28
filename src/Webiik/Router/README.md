@@ -116,16 +116,11 @@ Check
 -----
 ### match
 ```php
-match()
+match(): Route
 ```
-**match()** checks if current request URI matches some of defined route. If yes it returns **Route**, otherwise **FALSE**.
+**match()** checks if current request URI matches some of defined route and returns **Route**.
 ```php
 $route = $router->match();
-if ($route) {
-    // 200 OK
-} else {
-    // 404 Not Found or 405 Method Not Allowed
-}
 ```
 
 ### getHttpCode
@@ -158,7 +153,7 @@ $baseUrl = $router->getBaseURL();
 
 Route
 =====
-The Route is the result of successful [**match()**][3]. It contains all known information about the matched route.  
+The Route is the result of [**match()**][3]. It contains all known information about the route.  
 
 ### getMethods
 ```php
