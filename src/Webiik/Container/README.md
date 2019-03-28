@@ -5,7 +5,7 @@
 
 Container
 =========
-The Container adds handy methods to most common Pimple functions and then adds automatic injection of dependencies from container to class controller.
+The Container adds handy methods to most common Pimple functions and then adds automatic injection of dependencies from container to class constructor.
 
 Installation
 ------------
@@ -37,9 +37,8 @@ $container->addService('\Webiik\Arr\Arr', function () {
 ```
 If you need to access container inside **$factory**:
 ```php
-$container->addService('Service', function ($pimple) use ($container) {
-    // $container - Container
-    // $pimple - Pimple    
+$container->addService('Service', function ($container) {
+    // $container - Container    
 });
 ```
 
@@ -121,7 +120,7 @@ Container provides automatic dependency injection from Container to class contro
    ```
 
 ### Inject Service by Service Name
-1. Add service with name matching the following regex `/ws[A-Z]/`:
+1. Add service with name matching the following regex `ws[A-Z]`:
    ```php
    $container->addService('wsArray', function () {
       return new \Webiik\Arr\Arr();   
@@ -142,7 +141,7 @@ Container provides automatic dependency injection from Container to class contro
    }
    ```
    > Container will search for service with name `wsArray`. 
-4. Inject dependencies:
+4. Inject dependencies from container to your class:
    ```php
    $myClass = new MyClass(...$container->injectTo('MyClass'));
 
@@ -153,7 +152,7 @@ Container provides automatic dependency injection from Container to class contro
        echo 'Hello!';
    });
    ```
-2. Use parameter name in controller in your class:
+2. Use parameter name in constructor in your class:
    ```php   
    public function __construct($myFnName)
    {
@@ -161,10 +160,23 @@ Container provides automatic dependency injection from Container to class contro
    }
    ```
    > Container will search for parameter with name `myParamName`. 
-3. Inject dependencies:
+3. Inject dependencies from container to your class:
    ```php
    $myClass = new MyClass(...$container->injectTo('MyClass'));
-   ```  
+   ```
+   
+### Inject Container Itself
+1. Use full Container class name as type parameter in constructor in your class:
+   ```php   
+   public function __construct(\Webiik\Container\Container $container)
+   {
+       $this->container = $container;
+   }
+   ``` 
+2. Inject dependencies from container to your class:
+   ```php
+   $myClass = new MyClass(...$container->injectTo('MyClass'));
+   ```
 
 Resources
 ---------
