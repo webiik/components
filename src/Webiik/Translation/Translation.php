@@ -63,6 +63,10 @@ class Translation
      */
     public function add(string $key, string $val): void
     {
+        if (!isset($this->translation[$this->lang])) {
+            $this->translation[$this->lang] = [];
+        }
+
         $this->arr->set($key, $val, $this->translation[$this->lang]);
     }
 
@@ -121,7 +125,7 @@ class Translation
      */
     public function get(string $key, $context = null)
     {
-        if (!$this->arr->isIn($key, $this->translation[$this->lang])) {
+        if (!$this->arr->isIn($this->lang . '.' . $key, $this->translation)) {
             $this->addMissingKey($key);
             return '';
         }
