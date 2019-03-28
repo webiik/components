@@ -1,5 +1,5 @@
 #!/bin/bash
-git subtree push --prefix=src/Webiik/App App master --squash
+git subtree push --prefix=src/Webiik/Account Account master --squash
 git subtree push --prefix=src/Webiik/Arr Arr master --squash
 git subtree push --prefix=src/Webiik/Container Container master --squash
 git subtree push --prefix=src/Webiik/Cookie Cookie master --squash
