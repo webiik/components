@@ -65,9 +65,10 @@ class Database
             );
         }
 
-        foreach ($this->database[$name]['exec'] as $row) {
-            $q = $this->database[$name]['pdo']->prepare($row);
-            $q->execute();
+        foreach ($this->database[$name]['exec'] as $query => $params) {
+            $q = $this->database[$name]['pdo']->prepare($query);
+            $params = is_array($params) ? $params : [$params];
+            $q->execute($params);
         }
 
         return $this->database[$name]['pdo'];

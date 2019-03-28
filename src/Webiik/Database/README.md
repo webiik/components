@@ -37,7 +37,7 @@ add(string $name, string $driver, string $host, string $databaseName, string $us
 * **user** database user name
 * **password** database user password
 * **options** array of [PDO options](http://php.net/manual/en/class.pdo.php)
-* **commands** array of MySQL commands to execute after connecting to database. It's handy for setting time-zone, encoding etc.
+* **commands** associative array of MySQL commands with parameters to execute after connecting to database. E.g. ['SET CHARACTER SET ?' => 'utf8']
 ```php
 $db->add('main', 'mysql', 'localhost', 'webiik', 'root', 'root');
 ```
