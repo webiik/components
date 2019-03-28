@@ -1,87 +1,143 @@
 <?php
 declare(strict_types=1);
 
-namespace Webiik\Account\Accounts;
-
-use Webiik\Privileges\Privileges;
+namespace Webiik\Account;
 
 abstract class AccountBase implements AccountInterface
 {
+    /**
+     * Common authentication status codes and messages
+     */
     public const FAILURE = 0,
         METHOD_IS_NOT_IMPLEMENTED = 1,
         INVALID_CREDENTIAL = 2,
-        ALREADY_EXISTS = 3,
-        REQUIRES_ACTIVATION = 4,
-        IS_BANNED = 5,
-        IS_DISABLED = 6,
-        IS_OK = 7;
+        INVALID_PASSWORD = 3,
+        INVALID_TOKEN = 4,
+        INVALID_KEY = 5,
+        ACCOUNT_DOES_NOT_EXIST = 6,
+        ACCOUNT_ALREADY_EXISTS = 7,
+        ACCOUNT_IS_NOT_ACTIVATED = 8,
+        ACCOUNT_IS_BANNED = 9,
+        ACCOUNT_IS_DISABLED = 10,
+        ACCOUNT_IS_OK = 20;
+
+    public const MSG_FAILURE = 'Failure.',
+        MSG_METHOD_IS_NOT_IMPLEMENTED = 'Method is not implemented.',
+        MSG_INVALID_CREDENTIAL = 'Invalid credential(s).',
+        MSG_INVALID_PASSWORD = 'Invalid password.',
+        MSG_INVALID_TOKEN = 'Invalid token.',
+        MSG_ACCOUNT_DOES_NOT_EXIST = 'Account does not exist.',
+        MSG_ACCOUNT_ALREADY_EXISTS = 'Account already exists.',
+        MSG_ACCOUNT_IS_NOT_ACTIVATED = 'Account requires activation.',
+        MSG_ACCOUNT_IS_BANNED = 'Account is banned.',
+        MSG_ACCOUNT_IS_DISABLED = 'Account is disabled.',
+        MSG_ACCOUNT_IS_OK = 'Account is ok';
 
     /**
-     * @var Privileges
+     * Account namespace
+     * @var string
      */
-    private $privileges;
+    public $namespace = '';
 
-     */
     /**
-     * AccountBase constructor.
-     * @param Privileges $privileges
+     * @param array $credentials
+     * @return User
+     * @throws AccountException
      */
-    public function __construct(Privileges $privileges)
-    {
-        $this->privileges = $privileges;
-    }
-
     public function auth(array $credentials): User
     {
-        if (isset($credentials['email'], $credentials['password'])) {
-            list('email' => $email, 'password' => $password, 'id' => $id) = $credentials;
-        }
-
-        if (isset($credentials['id'])) {
-            list('id' => $id) = $credentials;
-        }
-
-        return new User($id, $role, $info, $status, $this->privileges);
+        throw new AccountException('Method auth() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
+    /**
+     * @param array $credentials
+     * @return User
+     * @throws AccountException
+     */
     public function signup(array $credentials): User
     {
-        // TODO: Implement signup() method.
+        throw new AccountException('Method signup() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
-    public function update(array $id, array $data): User
+    /**
+     * @param int $uid
+     * @param array $data
+     * @return User
+     * @throws AccountException
+     */
+    public function update(int $uid, array $data): User
     {
-        // TODO: Implement update() method.
+        throw new AccountException('Method update() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
-    public function disable(array $id, int $reason): User
+    /**
+     * @param int $uid
+     * @param int $reason
+     * @return User
+     * @throws AccountException
+     */
+    public function disable(int $uid, int $reason): User
     {
-        // TODO: Implement disable() method.
+        throw new AccountException('Method disable() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
-    public function delete(array $id): User
+    /**
+     * @param int $uid
+     * @return User
+     * @throws AccountException
+     */
+    public function delete(int $uid): User
     {
-        // TODO: Implement delete() method.
+        throw new AccountException('Method delete() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
-    public function createActivation($uid): array
+    /**
+     * @param int $uid
+     * @return string
+     * @throws AccountException
+     */
+    public function createToken(): string
     {
-        // TODO: Implement createActivation() method.
+        throw new AccountException('Method createToken() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
-    public function activate(array $id): User
+    /**
+     * @param string $token
+     * @return User
+     * @throws AccountException
+     */
+    public function activate(string $token): User
     {
-        // TODO: Implement activate() method.
+        throw new AccountException('Method activate() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
-    public function createPasswordReset($uid): array
+    /**
+     * @param string $token
+     * @param string $password
+     * @return User
+     * @throws AccountException
+     */
+    public function resetPassword(string $token, string $password): User
     {
-        // TODO: Implement createPasswordReset() method.
+        throw new AccountException('Method resetPassword() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
-    public function resetPassword(array $id, string $password): User
+    /**
+     * @param string $password
+     * @return string
+     */
+    protected function hashPassword(string $password): string
     {
-        // TODO: Implement resetPassword() method.
+        return password_hash($password, PASSWORD_BCRYPT);
     }
 
+    /**
+     * @param string $password
+     * @param string $hash
+     * @return bool
+     */
+    protected function verifyPassword(string $password, string $hash): bool
+    {
+        return password_verify($password, $hash);
+    }
 }
