@@ -1,7 +1,7 @@
 {
   "name": "webiik/container",
   "type": "library",
-  "description": "The Container adds handy methods to most common Pimple functions and then adds automatic injection of dependencies from container to class controller.",
+  "description": "The Container adds handy methods to most common Pimple functions and then adds automatic injection of dependencies from container to class constructor.",
   "keywords": ["di", "dependency", "injection", "container"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
