@@ -115,7 +115,7 @@ class Container extends \Pimple\Container
             // Get service name
             $serviceName = $methodParam->getName();
 
-            // Parameter is a class, use class name or doc block paramType as service name
+            // If parameter type is a class, use class name or doc block paramType as service name
             if ($methodParam->getClass()) {
                 $serviceName = $methodParam->getClass()->getName();
 
@@ -131,7 +131,9 @@ class Container extends \Pimple\Container
                 }
             }
 
-            if ($methodParam->isDefaultValueAvailable()) {
+            if ($serviceName == 'Webiik\Container\Container') {
+                $methodParamInstances[] = $this;
+            } elseif ($methodParam->isDefaultValueAvailable() && !$this->isIn($serviceName)) {
                 $methodParamInstances[] = $methodParam->getDefaultValue();
             } else {
                 $methodParamInstances[] = $this->get($serviceName);
