@@ -1,0 +1,25 @@
+{
+  "name": "webiik/privileges",
+  "type": "library",
+  "description": "The Privileges class manages user authorization.",
+  "keywords": ["authorization", "privileges", "acl"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\Privileges\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
