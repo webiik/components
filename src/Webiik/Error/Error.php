@@ -96,7 +96,7 @@ class Error
      * In silent mode, errors are logged but not displayed
      * @param bool $bool
      */
-    public function silent(bool $bool): void
+    public function setSilent(bool $bool): void
     {
         $this->silent = $bool;
     }
@@ -191,7 +191,7 @@ class Error
     {
         return function () {
             $err = error_get_last();
-            if ($err && $err['type'] === E_ERROR) {
+            if ($err) {
                 // Separate message
                 preg_match('/.+/', $err['message'], $match);
                 $msg = $match ? $match[0] : '';

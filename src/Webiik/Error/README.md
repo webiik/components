@@ -21,13 +21,13 @@ $error = new \Webiik\Error\Error();
 
 Silent mode
 -----------
-### silent
+### setSilent
 ```php
-silent(bool $bool): void
+setSilent(bool $bool): void
 ```
-**silent()** activates or deactivates silent mode. When Error is not in silent mode it halts code execution on every error and then it displays error message. In silent mode instead of displaying error message a custom error page is shown and some errors can be completely ignored.
+**setSilent()** activates or deactivates silent mode. When Error is not in silent mode it halts code execution on every error and then it displays error message. In silent mode instead of displaying error message a custom error page is shown and some errors can be completely ignored.
 ```php
-$error->silent(true);
+$error->setSilent(true);
 ```
 ### setSilentPageContent 
 ```php
