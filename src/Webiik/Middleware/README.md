@@ -22,11 +22,11 @@ $middleware->run();
 ```
 Writing Middleware
 ------------------
-Every middleware has to be a class with at least one public method with the following parameters **callable $next, [\Webiik\Data\Data $data][4]**. Every class can contain more methods with the mentioned parameters.
+Every middleware has to be a class with at least one public method with the following parameters **[\Webiik\Data\Data $data][4], callable $next**. Every class can contain more methods with the mentioned parameters.
 ```php
 class MwTest
 {
-    public function run(callable $next, \Webiik\Data\Data $data)
+    public function run(\Webiik\Data\Data $data, callable $next)
     {
         // Get middleware data
         $mwData = $data->getAll(); // Array([foo] => [bar])

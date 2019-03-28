@@ -74,7 +74,7 @@ class Middleware
                     $this->middlewareData->set($key, $val);
                 }
             }
-            $middleware->$method($this->next(), $this->middlewareData);
+            $middleware->$method($this->middlewareData, $this->next());
         }
     }
 
