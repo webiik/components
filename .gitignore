@@ -1,5 +1,6 @@
 .idea
 .DS_Store
+config.local.php
 composer.lock
 vendor
 test/tmp/*

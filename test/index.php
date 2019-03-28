@@ -10,7 +10,7 @@ $silent = false;
 $error = new \Webiik\Error\Error();
 
 // Use silent error reporting
-$error->silent($silent);
+$error->setSilent($silent);
 
 // These error types will not stop code executing in silent mode
 $error->setSilentIgnoreErrors([
