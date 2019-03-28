@@ -121,9 +121,9 @@ class Router
     /**
      * Match current request URI against defined routes.
      * If route doesn't exist return false.
-     * @return Route|false
+     * @return Route
      */
-    public function match()
+    public function match(): Route
     {
         $requestURI = $this->getBaseRequestURI();
 
@@ -167,25 +167,41 @@ class Router
                     }
                 }
 
-                // Create matched route
-                $route = new Route(
-                    $route->httpMethods,
-                    $regex,
-                    $route->controller,
-                    $route->name,
-                    $route->lang,
-                    $route->middleware,
-                    $route->sensitive,
-                    $parameters,
-                    $this->baseURI,
-                    $this->getServer()
-                );
-
                 // Matching route found, stop searching
                 break;
             }
         }
-        return isset($route) ? $route : false;
+
+        // Create matched route
+        if (isset($route)) {
+            $route = new Route(
+                $route->httpMethods,
+                isset($regex) ? $regex : [],
+                $route->controller,
+                $route->name,
+                $route->lang,
+                $route->middleware,
+                $route->sensitive,
+                isset($parameters) ? $parameters : [],
+                $this->baseURI,
+                $this->getServer()
+            );
+        } else {
+            $route = new Route(
+                [],
+                isset($regex) ? $regex : [],
+                '',
+                '',
+                '',
+                [],
+                false,
+                isset($parameters) ? $parameters : [],
+                $this->baseURI,
+                $this->getServer()
+            );
+        }
+
+        return $route;
     }
 
     /**
@@ -254,11 +270,16 @@ class Router
 
     /**
      * Get request URI without query string and base URL
+     * @throws \Exception
      * @return string
      */
     private function getBaseRequestURI(): string
     {
-        return substr($this->getRequestURI(), strlen($this->baseURI));
+        $baseRequestURI = substr($this->getRequestURI(), strlen($this->baseURI));
+        if (is_bool($baseRequestURI)) {
+            throw new \Exception('Class: Router, Invalid base URI set by method setBaseURI()');
+        }
+        return $baseRequestURI;
     }
 
     /**
@@ -268,7 +289,7 @@ class Router
      */
     private function getLangFromRequestURI(string $URI)
     {
-        preg_match('~/([a-z]{2})/~i', $URI, $lang);
+        preg_match('~^/([a-z]{2})/~i', $URI, $lang);
         return isset($lang[1], $this->routeLangs[$lang[1]]) ? $lang[1] : '';
     }
 
