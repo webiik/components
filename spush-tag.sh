@@ -40,6 +40,8 @@ if [[ "$#" == 1 ]]; then
 
 		cd ${currentDir}
 
+		git subtree split --prefix=src/Webiik/${dir} -b ${dir}
+
 		git push ~/webiik-repos/${dir} ${dir}:master
 
 		cd ~/webiik-repos/${dir}
@@ -53,6 +55,8 @@ if [[ "$#" == 1 ]]; then
 		git push origin master --tags --force
 
 		cd ${currentDir}
+
+		git branch -D ${dir}
 
 		git subtree push --prefix=src/Webiik/${dir} ${dir} master --squash
 	done
@@ -81,6 +85,8 @@ if [[ "$#" > 1 ]]; then
 
 		cd ${currentDir}
 
+		git subtree split --prefix=src/Webiik/${dir} -b ${dir}
+
 		git push ~/webiik-repos/${dir} ${dir}:master
 
 		cd ~/webiik-repos/${dir}
@@ -94,6 +100,8 @@ if [[ "$#" > 1 ]]; then
 		git push origin master --tags --force
 
 		cd ${currentDir}
+
+		git branch -D ${dir}
 
 		git subtree push --prefix=src/Webiik/${dir} ${dir} master --squash
 	done
