@@ -279,7 +279,7 @@ class Router
         if (is_bool($baseRequestURI)) {
             throw new \Exception('Class: Router, Invalid base URI set by method setBaseURI()');
         }
-        return $baseRequestURI;
+        return $baseRequestURI ? $baseRequestURI : '/';
     }
 
     /**
