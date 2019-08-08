@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Webiik\Validator\Rules;
 
-class IsRequired implements RuleInterface
+class IsPresent implements RuleInterface
 {
     /**
      * @var string
