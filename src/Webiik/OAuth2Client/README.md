@@ -29,8 +29,9 @@ $oAuth2Client = new \Webiik\OAuth2Client\OAuth2Client($chc);
 $oAuth2Client->setRedirectUri('https://127.0.0.1/webiik/');
 
 // API endpoints
-$oAuth2Client->setAuthorizeUrl('https://www.facebook.com/v3.2/dialog/oauth');
-$oAuth2Client->setAccessTokenUrl('https://graph.facebook.com/v3.2/oauth/access_token');
+$oAuth2Client->setAuthorizeUrl('https://www.facebook.com/v3.3/dialog/oauth');
+$oAuth2Client->setAccessTokenUrl('https://graph.facebook.com/v3.3/oauth/access_token');
+$oAuth2Client->setValidateTokenUrl('https://graph.facebook.com/debug_token');
 
 // API credentials (create yours at https://developers.facebook.com/apps/)
 $oAuth2Client->setClientId('your-client-id');
@@ -56,9 +57,32 @@ if (isset($_GET['code'])) {
     $app = $oAuth2Client->getAccessTokenByCredentials();
 }
 
-if (isset($user['access_token']) && isset($app['access_token'])) {
+if (isset($user, $user['access_token']) && isset($app, $app['access_token'])) {
     // 4. User and app access_tokens are valid, user and app are authorized by Facebook
     // Access protected resources...
+    
+    // Get user id
+    $tokenInfo = $oAuth2Client->getTokenInfo($user['access_token'], $app['access_token'], true);
+    if (!isset($tokenInfo['data'], $tokenInfo['data']['user_id'])) {
+        // Err: Can't obtain user id 
+        print_r($tokenInfo);
+        exit;
+    }
+    
+    // Get additional user info
+    $fields = [
+        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'email',
+    ];
+    $reg = $chc->prepareRequest('https://graph.facebook.com/v3.3/' . $tokenInfo['data']['user_id'] . '/?access_token=' . $user['access_token'] . '&fields=' . implode(',', $fields));
+    $res = $chc->send($reg);
+    if ($res->isOk()) {
+        header('Content-Type: application/json');
+        echo $res->body();
+    }    
 }
 ```
 
