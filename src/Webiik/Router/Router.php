@@ -39,12 +39,23 @@ class Router
     private $httpCode = 404;
 
     /**
+     * After calling getURL or getURI, this is filled with array of missing route parameters:
+     * [int parameterPosition => string parameterRegex], ...
+     * @var array
+     */
+    private $missingParameters = [];
+
+    /**
      * Set the base directory of your index.php file relatively to web-server root
      * @param string $baseURI
      */
     public function setBaseURI(string $baseURI): void
     {
-        $this->baseURI = '/' . trim($baseURI, '/');
+        if (!$baseURI || $baseURI == '/') {
+            $this->baseURI = '';
+        } else {
+            $this->baseURI = '/' . trim($baseURI, '/');
+        }
     }
 
     /**
@@ -155,9 +166,8 @@ class Router
                     break;
                 }
 
-                // Get route parameters
+                // Prepare route parameters
                 unset($match[0]);
-                $parameters = $match;
 
                 // Get route regex fot all lang version
                 $regex[$route->lang] = $route->regex;
@@ -172,36 +182,136 @@ class Router
             }
         }
 
-        // Create matched route
-        if (isset($route)) {
-            $route = new Route(
-                $route->httpMethods,
-                isset($regex) ? $regex : [],
-                $route->controller,
-                $route->name,
-                $route->lang,
-                $route->middleware,
-                $route->sensitive,
-                isset($parameters) ? $parameters : [],
-                $this->baseURI,
-                $this->getServer()
-            );
+        // Create route
+        if (isset($regex)) {
+            // Route found (200, 405)
+            $route = new Route($route->controller, $route->name, $route->lang, $route->middleware, $match);
         } else {
-            $route = new Route(
-                [],
-                isset($regex) ? $regex : [],
-                '',
-                '',
-                '',
-                [],
-                false,
-                isset($parameters) ? $parameters : [],
-                $this->baseURI,
-                $this->getServer()
-            );
+            // Route not found (404)
+            $route = new Route('', '', '', [], []);
         }
 
         return $route;
+    }
+
+    /**
+     * Get URI by route name
+     * @param string $routeName
+     * @param array $parameters Route parameters
+     * @param string $lang Route language
+     * @return string
+     */
+    public function getURI(string $routeName, array $parameters = [], string $lang = ''): string
+    {
+        // Default return value
+        $URI = '';
+
+        // Determine lang
+        $lang = $lang ? $lang : $this->defaultLang;
+
+        // Check if route exists
+        if (isset($this->routes[$lang], $this->routes[$lang][$routeName])) {
+
+            // Check if all parameters were provided...
+
+            // Reset missing route parameters before every getURI call
+            $this->missingParameters = [];
+
+            // Position of parameter in $parameters array
+            $paramPos = 0;
+
+            // Replace regex groups(parameters) with values
+            $URI = preg_replace_callback('~(\((\?\<(.+?)\>+)?.+?\)(\?)?)/~',function ($match) use (&$parameters, &$paramPos) {
+
+                // Set default URI parameter replacement value
+                $replacement = '';
+
+                // Determine if URI parameter is required
+                $isParamRequired = isset($match[4]) && $match[4] ? false : true;
+
+                // Determine parameter key by parameter type (named : anonymous)
+                $paramKey = isset($match[3]) && $match[3] ? $match[3] : $paramPos;
+
+                // Update URI parameter with value from $parameters
+                if (isset($parameters[$paramKey]) && preg_match('~' . $match[1] . '~', $parameters[$paramKey])) {
+                    $replacement = $parameters[$paramKey];
+                } elseif ($isParamRequired) {
+                    $this->missingParameters[$paramKey] = $match[1];
+                }
+
+                // In preg_replace_callback we replace slash after regex group.
+                // We have to add this slash back. But in case of empty replacement,
+                // we don't add it back to prevent double slashes '//'.
+                $slash = $replacement ? '/' : '';
+
+                // Update index position of $parameters array
+                $paramPos++;
+
+                return $replacement . $slash;
+            }, $this->routes[$lang][$routeName]->regex);
+
+            // Never return URI when required parameters are missing
+            if ($this->missingParameters) {
+                $URI = '';
+            }
+
+            // Finalize URI (remove regex special chars to get clean URI)
+            if ($URI) {
+                $URI = $this->baseURI . preg_replace('/[~\^\?\$]|i$/', '', $URI);
+                $URI = substr($URI, strlen($this->baseURI));
+            }
+        }
+
+        return $URI;
+    }
+
+    /**
+     * Get URL by route name
+     * @param string $routeName
+     * @param array $parameters
+     * @param string $lang
+     * @return string
+     */
+    public function getURL(string $routeName, array $parameters = [], string $lang = ''): string
+    {
+        $URL = '';
+        if ($URI = $this->getURI($routeName, $parameters, $lang)) {
+            $URI = $URI == '/' ? '' : $URI;
+            $URL = $this->getBaseURL() . $URI;
+        }
+        return $URL;
+    }
+
+    /**
+     * Get missing parameters after calling getURI or getURL
+     * [int parameterPosition => string parameterRegex], ...
+     * e.g. ['1' => '([a-z]*)']
+     * @return array
+     */
+    public function getMissingParameters(): array
+    {
+        return $this->missingParameters;
+    }
+
+    /**
+     * Get route regex parameters
+     * [int parameterPosition => string parameterRegex], ...
+     * e.g. ['0' => '(?<name>[a-z]*)?', '1' => '([a-z]*)']
+     * @param string $routeName
+     * @param string $lang
+     * @return array|false
+     */
+    public function getRegexParameters(string $routeName, string $lang = '')
+    {
+        // Determine lang
+        $lang = $lang ? $lang : $this->defaultLang;
+
+        if (isset($this->routes[$lang], $this->routes[$lang][$routeName])) {
+            preg_match_all('~\(.+?\)\??~', $this->routes[$lang][$routeName]->regex, $matches);
+            return $matches[0];
+        }
+
+        return false;
     }
 
     /**
@@ -255,7 +365,13 @@ class Router
      */
     private function getHost(): string
     {
-        return isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME'] ? $_SERVER['SERVER_NAME'] : $_SERVER['SERVER_ADDR'];
+        $host = $_SERVER['SERVER_ADDR'];
+        if (isset($_SERVER['SERVER_NAME']) && $_SERVER['SERVER_NAME']) {
+            $host = $_SERVER['SERVER_NAME'];
+        } elseif (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST']) {
+            $host = $_SERVER['HTTP_HOST'];
+        }
+        return $host;
     }
 
     /**
@@ -270,16 +386,20 @@ class Router
 
     /**
      * Get request URI without query string and base URL
-     * @throws \Exception
      * @return string
+     * @throws \Exception
      */
     private function getBaseRequestURI(): string
     {
-        $baseRequestURI = substr($this->getRequestURI(), strlen($this->baseURI));
-        if (is_bool($baseRequestURI)) {
-            throw new \Exception('Class: Router, Invalid base URI set by method setBaseURI()');
+        if (!$this->baseURI || $this->baseURI == '/') {
+            $baseRequestURI = $this->getRequestURI();
+        } else {
+            $baseRequestURI = substr($this->getRequestURI(), strlen($this->baseURI));
+            if (is_bool($baseRequestURI)) {
+                throw new \Exception('Class: Router, Invalid base URI set by method setBaseURI()');
+            }
         }
-        return $baseRequestURI ? $baseRequestURI : '/';
+        return $baseRequestURI;
     }
 
     /**
@@ -322,7 +442,7 @@ class Router
     {
         if (substr($requestURI, -1) != '/' || substr($requestURI, -2) == '//') {
             header('HTTP/1.1 301 Moved Permanently');
-            header('Location:' . $this->baseURI . rtrim($requestURI, '/') . '/' . $this->getUrlQuery($_GET));
+            header('Location: ' . $this->baseURI . rtrim($requestURI, '/') . '/' . $this->getUrlQuery($_GET));
             exit();
         }
     }

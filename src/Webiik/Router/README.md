@@ -151,27 +151,45 @@ getBaseURL(): string
 $baseUrl = $router->getBaseURL();
 ```
 
+### getURI
+```php
+getURI(string $routeName, array $parameters = [], string $lang = ''): string
+```
+**getURI()** returns route's URI. If it can't find the route or some of the required route parameters is missing, then it returns the empty string. After calling getURI(), you can get missing parameters by calling **[getMissingParameters()](#getmissingparameters)**  
+```php
+$route->getURI();
+```
+
+### getURL
+```php
+getURL(string $routeName, array $parameters = [], string $lang = ''): string
+```
+**getURL()** same as **[getURI()](#geturi)**, but returns full URL.
+```php
+$route->getURL();
+```
+
+### getMissingParameters
+```php
+getMissingParameters(): array
+```
+**getMissingParameters()** returns missing parameters after calling **getURI()** or **getURL()**.
+```php
+$route->getMissingParameters();
+```
+
+### getRegexParameters
+```php
+getRegexParameters(string $routeName, string $lang = '')
+```
+**getRegexParameters()** returns array with route regex parameters e.g. ['0' => '(?\<name\>[a-z]*)?', '1' => '([a-z]*)']. If the route doesn't exist, it returns false.
+```php
+$route->getRegexParameters();
+```
+
 Route
 =====
-The Route is the result of [**match()**][3]. It contains all known information about the route.  
-
-### getMethods
-```php
-getMethods(): array
-```
-**getMethods()** returns route methods. 
-```php
-$route->getMethods();
-```
-
-### getRegex
-```php
-getRegex(): string
-```
-**getRegex()** returns route definition.
-```php
-$route->getRegex();
-```
+The Route is the result of [**match()**][3]. It contains handy information about the current route.  
 
 ### getController
 ```php
@@ -216,51 +234,6 @@ getParameters(): array
 **getParameters()** returns parameters injected during Route construction e.g. ['name' => 'dolly', '1' => 'dolly', '2' => 'hello'].
 ```php
 $route->getParameters();
-```
-
-### getRegexParameters
-```php
-getRegexParameters(string $lang = ''): array
-```
-**getRegexParameters()** returns route regex parameters e.g. ['0' => '(?\<name\>[a-z]*)?', '1' => '([a-z]*)'].
-```php
-$route->getRegexParameters();
-```
-
-### getURI
-```php
-getURI(array $parameters = [], string $lang = ''): string
-```
-**getURI()** returns URI of this route or empty string if it can't get URI. Usually it returns empty string when parameters are missing or route doesn't exist in required language. 
-```php
-$route->getURI();
-```
-
-### getURL
-```php
-getURL(array $parameters = [], string $lang = ''): string
-```
-**getURL()** returns URL of this route or empty string if it can't get URL. Usually it returns empty string when parameters are missing or route doesn't exist in required language.
-```php
-$route->getURL();
-```
-
-### getMissingParameters
-```php
-getMissingParameters(): array
-```
-**getMissingParameters()** returns missing parameters after calling **getURI()** or **getURL()**.
-```php
-$route->getMissingParameters();
-```
-
-### isSensitive
-```php
-isSensitive(): bool
-```
-**isSensitive()** indicates if route definition (regex) is case sensitive.
-```php
-$route->isSensitive();
 ```
 
 Resources
