@@ -17,18 +17,21 @@ class Validator
      * @param mixed $input Input value to validate
      * @param callable $rules MUST return array of RuleInterface implementations
      * @param string $name Input name
+     * @param bool $isRequired Is input required or optional?
      */
-    public function addInput($input, callable $rules, string $name = ''): void
+    public function addInput($input, callable $rules, string $name = '', bool $isRequired = false): void
     {
         if ($name) {
             $this->inputs[$name] = [
                 'i' => $input,
                 'r' => $rules,
+                'q' => $isRequired,
             ];
         } else {
             $this->inputs[] = [
                 'i' => $input,
                 'r' => $rules,
+                'q' => $isRequired,
             ];
         }
     }
@@ -41,6 +44,10 @@ class Validator
     {
         $invalid = [];
         foreach ($this->inputs as $key => $input) {
+            // Don't check empty optional inputs
+            if (!$input['i'] && !$input['q']) {
+                continue;
+            }
             foreach ($input['r']() as $rule) {
                 /**@var RuleInterface $rule */
                 if (!$rule->isInputOk($input['i'])) {

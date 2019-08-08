@@ -34,21 +34,22 @@ Adding Inputs For Validation
 ----------------------------
 ### addInput
 ```php
-addInput($input, callable $rules, string $name = ''): void
+addInput($input, callable $rules, string $name = '', bool $isRequired = false): void
 ```
 **addInput()** adds an input for validation.
 
 **Parameters**
 * **input** input value
 * **rules** callable that return an array of validation rule objects
-* **name** optional input name. This name is used as input index in validate() result.  
+* **name** optional input name. This name is used as input index in validate() result.
+* **isRequired** optional. Indicates if input is required or not. Empty optional inputs are always considered as valid.   
 ```php
 $validator->addInput('meow', function () {
     return [
         new \Webiik\Validator\Rules\StrLenMin(5, 'Err: Input is shorter than 5 chars.'),
         new \Webiik\Validator\Rules\StrLenMax(10, 'Err: Input is longer than 10 chars.'),
     ];
-}, 'greeting');
+}, 'greeting', true);
 ```
 
 Validation Rules
@@ -96,7 +97,7 @@ isObject(string $errMsg = '')
 ```
 ```php
 // Check if input is not empty
-isRequired(string $errMsg = '')
+isPresent(string $errMsg = '')
 ```
 ```php
 // Check if input is_string()
