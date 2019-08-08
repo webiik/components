@@ -51,6 +51,12 @@ class Error
      */
     private $silentPageContent = '';
 
+    /**
+     * Indicates if silent page is already shown
+     * @var bool
+     */
+    private $silentPageShown = false;
+
     public function __construct()
     {
         // Configure error reporting
@@ -261,7 +267,13 @@ class Error
         $exit = false;
 
         if ($this->silent && !in_array($errType, $this->silentIgnoreErrors)) {
-            echo $this->silentPageContent;
+
+            // We need silentPageShown indicator to prevent multiple output of silent error page,
+            // because exit; doesn't stop shut down functions execution
+            if (!$this->silentPageShown) {
+                echo $this->silentPageContent;
+                $this->silentPageShown = true;
+            }
             $exit = true;
         }
 
