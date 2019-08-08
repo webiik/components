@@ -51,9 +51,15 @@ if (isset($_GET['oauth_verifier'])) {
     $accessToken = $oAuth1Client->getAccessToken();
 }
 
-if (isset($accessToken['oauth_token'])) {
+if (isset($accessToken, $accessToken['oauth_token'], $accessToken['oauth_token_sercret'])) {
     // 3. oauth_token is valid, user is authorized by Twitter
-    // Access protected resources...
+    // Access protected resources...    
+    $urlParameters = [
+        'skip_status' => 'true',   
+    ];
+    $res = $oAuth1Client->get('https://api.twitter.com/1.1/account/verify_credentials.json', $accessToken['oauth_token'], $accessToken['oauth_token_secret'], $urlParameters);
+    header('Content-Type: application/json');
+    echo $res;
 }
 ```
 
@@ -146,6 +152,35 @@ getAccessToken()
 **getAccessToken()** makes HTTP POST request to URL set by [setAccessTokenUrl()](#setaccesstokenurl) and returns an array with 'oauth_token' on success and a string with cURL error message on error.
 ```php
 $accessToken = $oAuth1Client->getAccessToken();
+```
+
+API Access
+----------
+### get
+```php
+get(string $url, string $oauth_token, string $oauth_token_secret, array $params = []): string
+```
+**get()** makes authorized HTTP GET request to OAuth1 API endpoint.
+```php
+$urlParameters = [
+    'skip_status' => 'true',   
+];
+$response = $oAuth1Client->get('https://api.twitter.com/1.1/account/verify_credentials.json', $accessToken['oauth_token'], $accessToken['oauth_token_secret'], $urlParameters);
+```
+
+### post
+```php
+post(string $url, string $oauth_token, string $oauth_token_secret, array $params = [], array $postData = []): string
+```
+**post()** makes authorized HTTP POST request to OAuth1 API endpoint.
+```php
+$urlParameters = [
+    'include_entities' => 'true',   
+];
+$postData = [
+    'status' => 'Hello Ladies + Gentlemen, a signed OAuth request!',
+];
+$response = $oAuth1Client->post('https://api.twitter.com/1.1/statuses/update.json', $accessToken['oauth_token'], $accessToken['oauth_token_secret'], $urlParameters, $postData);
 ```
 
 Resources
