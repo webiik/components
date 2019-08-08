@@ -13,7 +13,6 @@
   ],
   "require": {
     "php": ">=7.2",
-    "webiik/token": "^1",
     "webiik/curlhttpclient": "^1"
   },
   "autoload": {
