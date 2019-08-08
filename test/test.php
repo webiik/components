@@ -120,42 +120,39 @@ $log->write();
 
 // Test Router
 $router = new \Webiik\Router\Router();
-$router->setBaseURI('webiik/components');
-$router->addRoute(['get'], '/', 'Class:method');
+$router->setBaseURI('webiik/components/test');
+$router->addRoute(['get'], '/', 'Class:method', 'home');
 $router->addRoute(['get'], '/mysak/', 'Class:method', 'mouse', 'cs');
 $router->addRoute(['get'], '/mouse/', 'Class:method');
-$router->addRoute(['get'], '/meow/(?<name>[a-z]+)?', 'Class:method', 'meow')->sensitive();
+$router->addRoute(['get'], '/meow/(?<name>[a-z]+)/([a-z]*)', 'Class:method', 'meow')->sensitive();
 $router->addRoute(['get'], '/mnau/(?<name>[a-z]*)?/([a-z]*)', 'Class:method', 'meow', 'cs')->mw('Class:method');
 $router->addRoute(['get'], '/miau/(?<name>[a-z]+)?', 'Class:method', 'meow', 'de');
 $route = $router->match();
 
 if ($router->getHttpCode() == 200) {
-
-    echo 'Route regex: ' . htmlspecialchars($route->getRegex()) . '</br>';
-    echo 'Route regex params: ';
-    print_r($route->getRegexParameters());
-    echo '</br>';
-    echo 'Route param values: ';
-    print_r($route->getParameters());
-    echo '</br>';
-    echo 'Route lang: ' . $route->getLang() . '</br>';
-    echo 'Route URL: ' . $route->getURL() . '</br>';
-    echo 'Route URI: ' . $route->getURI() . '</br>';
-    echo 'Route URI: ' . $route->getURI([], 'en') . '</br>';
-//    echo 'Route URI: ' . $route->getURI(['Dolly']) . '</br>';
-    echo 'Missing route params: ';
-    print_r($route->getMissingParameters()); // ['2' => (\w+)]
-    echo '</br>';
-    echo 'Route methods: ';
-    print_r($route->getMethods()); // ['get']
+    echo '<b>Route</b></br>';
+    echo 'Route lang: ' . $route->getLang();
     echo '</br>';
     echo 'Route name: ' . $route->getName() . '</br>'; // home
+    echo 'Route controller and method: ';
     print_r($route->getController()); // ['class', 'method']
     echo '</br>';
     echo 'Route middleware: ';
     print_r($route->getMw()); // ['Class:method']
     echo '</br>';
-    echo 'Route sensitiveness: ' . $route->isSensitive() . '</br>'; // true
+    echo 'Route injected param values: ';
+    print_r($route->getParameters());
+    echo '<br/><br/>';
+    echo '<b>Router</b></br>';
+    echo 'Route regex params: ';
+    print_r($router->getRegexParameters($route->getName()));
+    echo '</br>';
+    echo 'Get URI for route ' . $route->getName() . ': ' . $router->getURI($route->getName(), $route->getParameters()) . '<br/>';
+    echo 'Get URL for route ' . $route->getName() . ': ' . $router->getURL($route->getName(), $route->getParameters()) . '<br/>';
+    echo 'Missing parameters for getURI, getURL: ';
+    print_r($router->getMissingParameters());
+    echo '<br/><br/>';
+
 } elseif ($router->getHttpCode() == 405) {
     // 405
     echo '405 - Method ' . $_SERVER['REQUEST_METHOD'] . ' Not Allowed' . '<br/>';
@@ -167,14 +164,17 @@ if ($router->getHttpCode() == 200) {
 }
 
 // Test Middleware
+echo '<b>Middleware</b></br>';
 require __DIR__ . '/HomeController.php';
 require __DIR__ . '/MwTest.php';
 $middleware = new \Webiik\Middleware\Middleware($container, new \Webiik\Data\Data());
 $middleware->add('MwTest:run', ['yyy' => 'YYY']);
 $middleware->add('HomeController:run', ['fff' => 'FFF']);
 $middleware->run();
+echo '<br/>';
 
 // Test Arr
+echo '<b>Arr</b></br>';
 echo 'Dot notation array test...<br/>';
 $arr = new \Webiik\Arr\Arr();
 $array = [];
@@ -183,28 +183,35 @@ $arr->set('dot.notation.test', ['key' => 'val'], $array);
 //$arr->delete('dot.notation.test', $array);
 print_r($arr->get('dot.notation.test', $array));
 echo '<br/>';
-echo 'Is key \'meow.dolly\' in array? ' . ($arr->isIn('meow.dolly', $array) ? 'Yes' : 'No') . '<br/>';
+echo 'Is key \'meow.dolly\' in array? ' . ($arr->isIn('meow.dolly', $array) ? 'Yes' : 'No');
+echo '<br/><br/>';
+
 // Test Token
+echo '<b>Token</b></br>';
 $token = new \Webiik\Token\Token();
 $safeToken = $token->generate();
 echo 'Token (' . strlen($safeToken) . '): ' . $safeToken . '<br/>';
 $cheapToken = $token->generateCheap();
 echo 'Token (' . strlen($cheapToken) . '): ' . $cheapToken . '<br/>';
 if ($token->compare($cheapToken, $safeToken)) {
-    echo 'Tokens are same.<br/>';
+    echo 'Tokens are same.';
 } else {
-    echo 'Tokens are different.<br/>';
+    echo 'Tokens are different.';
 }
+echo '<br/><br/>';
 
 // Test Cookie
+echo '<b>Cookie</b></br>';
 $cookie = new \Webiik\Cookie\Cookie();
 $cookie->setCookie('greeting', 'meow');
 if ($cookie->isCookie('greeting')) {
-    echo 'Greeting from cookie is: ' . $cookie->getCookie('greeting') . '<br/>';
+    echo 'Greeting from cookie is: ' . $cookie->getCookie('greeting');
 }
 //$cookie->delCookie('greeting');
+echo '<br/><br/>';
 
 // Test Session
+echo '<b>Session</b></br>';
 $session = new \Webiik\Session\Session();
 $session->setSessionDir(__DIR__ . '/tmp/sessions');
 //$session->setSessionGcLifetime(5);
@@ -215,22 +222,26 @@ $session->setToSession('foo', 'bar');
 echo 'Session module name: ' . session_module_name() . '<br/>';
 echo 'Session values: ';
 print_r($session->getAllFromSession());
-echo '<br/>';
+echo '<br/><br/>';
 
 // Test CSRF
+echo '<b>Csrf</b></br>';
 $csrf = new \Webiik\Csrf\Csrf($token, $session);
 echo 'CSRF token is: ' . $csrf->create() . '</br>';
 echo 'Is valid: ' . $csrf->validate('lZMNJZ74L1id0xZp') . '</br>';
+echo '<br/>';
 
 // Test Flash
+echo '<b>Flash</b></br>';
 $flash = new \Webiik\Flash\Flash($session);
 $flash->addFlashCurrent('inf', 'Meow {name}!', ['name' => 'Dolly']);
 $flash->addFlashNext('inf', 'Meow {name}!', ['name' => 'Molly']);
 echo 'Flash messages: ';
 print_r($flash->getFlashes());
-echo '<br/>';
+echo '<br/><br/>';
 
 // Test Login
+echo '<b>Login</b></br>';
 $login = new \Webiik\Login\Login($token, $cookie, $session);
 //$login->setNamespace($route->getLang()); // use login sections
 //$login->setAutoLogoutTime(3);
@@ -247,15 +258,17 @@ $login->setPermanentLoginStorage(function () {
 //$login->login(1, false, 'user');
 
 if ($login->isLogged()) {
-    echo 'User id: ' . $login->getUserId() . ' is logged.<br/>';
+    echo 'User id: ' . $login->getUserId() . ' is logged.';
 } else {
-    echo 'User is not logged<br/>';
+    echo 'User is not logged.';
 }
 
 $login->updateAutoLogoutTs();
 //$login->logout();
+echo '<br/><br/>';
 
 // Test Translation
+echo '<b>Translation</b></br>';
 $array = [
     'colors' => [
         'blue' => 'modra',
@@ -294,9 +307,10 @@ print_r($translation->get('ice-cream', ['gender' => 'male', 'name' => 'Peter']))
 echo '<br/>';
 echo 'Missing keys and contexts: ';
 print_r($translation->getMissing());
-echo '<br/>';
+echo '<br/><br/>';
 
 // Test Database
+echo '<b>Database</b></br>';
 echo 'Test database access: <br/>';
 $db = new \Webiik\Database\Database();
 $db->add('main', $config['database']['driver'], $config['database']['host'], $config['database']['db'], $config['database']['user'], $config['database']['pswd']);
@@ -304,9 +318,10 @@ $pdo = $db->connect();
 $q = $pdo->prepare('SELECT * FROM auth_users');
 $q->execute();
 print_r($q->fetchAll());
-echo '<br/>';
+echo '<br/><br/>';
 
 // Test View
+echo '<b>View</b></br>';
 $container->addService('\Webiik\View\View', function () {
     $view = new \Webiik\View\View();
     $view->setRenderer(function () {
@@ -329,6 +344,7 @@ $view = $container->get('\Webiik\View\View');
 echo $view->render('test.twig', ['name' => 'Dolly']);
 
 // Test Validator
+echo '<b>Validator</b></br>';
 $validator = new \Webiik\Validator\Validator();
 $validator->addInput('Hello', function () {
     return [
@@ -338,9 +354,10 @@ $validator->addInput('Hello', function () {
 }, 'greeting');
 $invalid = $validator->validate();
 print_r($invalid);
-echo '<br/>';
+echo '<br/><br/>';
 
 // Test CurlHttpClient
+echo '<b>Curl</b></br>';
 $chc = new \Webiik\CurlHttpClient\CurlHttpClient();
 
 //// Send multiple requests at once
