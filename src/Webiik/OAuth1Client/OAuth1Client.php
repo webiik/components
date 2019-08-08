@@ -166,25 +166,109 @@ class OAuth1Client
      */
     public function getAccessToken()
     {
-        // Prepare OAuth HTTP header
-        $oauth_token = isset($_GET['oauth_token']) ? $_GET['oauth_token'] : '';
-        $data = $this->prepareData($oauth_token);
-        $data = $this->addSignature($data, $this->oauth_access_token_url);
-        $headers = $this->prepareAuthHeader($data);
-
-        // Prepare oauth_verifier HTTP header and POST data
+        // Prepare POST data
         $oauth_verifier = isset($_GET['oauth_verifier']) ? $_GET['oauth_verifier'] : '';
         $postData = ['oauth_verifier' => $oauth_verifier];
 
+        // Basic request header data
+        $oauth_token = isset($_GET['oauth_token']) ? $_GET['oauth_token'] : '';
+        $headers = $this->prepareData($oauth_token);
+
+        // Add signature to header data
+        $headers['oauth_signature'] = $this->createSignature('POST', $this->oauth_access_token_url, $this->oauth_signature_secret, $headers, [], $postData);
+        $headers = $this->prepareAuthHeader($headers);
+
+        // Send HTTP request and get response
         $req = $this->curlHttpClient->prepareRequest($this->oauth_access_token_url);
         $req->method('POST');
         $req->headers($headers);
         $req->postData($postData);
         $res = $this->curlHttpClient->send($req);
-
         if ($res->isOk()) {
             parse_str($res->body(), $body);
             return $body;
+        }
+
+        return $res->errMessage();
+    }
+
+    /**
+     * Send authorized GET HTTP request to OAuth 1 server and return response
+     * @param string $url
+     * @param string $oauth_token
+     * @param string $oauth_token_secret
+     * @param array $params Associative array of URL parameters
+     * @return string
+     */
+    public function get(
+        string $url,
+        string $oauth_token,
+        string $oauth_token_secret,
+        array $params = []
+    ): string {
+        return $this->sendAuthRequest('GET', $url, $oauth_token, $oauth_token_secret, $params);
+    }
+
+    /**
+     * Send authorized POST HTTP request to OAuth 1 server and return response
+     * @param string $url
+     * @param string $oauth_token
+     * @param string $oauth_token_secret
+     * @param array $params Associative array of URL parameters
+     * @param array $postData Associative array of POST data
+     * @return string
+     */
+    public function post(
+        string $url,
+        string $oauth_token,
+        string $oauth_token_secret,
+        array $params = [],
+        array $postData = []
+    ): string {
+        return $this->sendAuthRequest('POST', $url, $oauth_token, $oauth_token_secret, $params, $postData);
+    }
+
+    /**
+     * Send authorized HTTP request to OAuth 1 server and return response
+     * @param string $method
+     * @param string $url
+     * @param string $oauth_token
+     * @param string $oauth_token_secret
+     * @param array $params
+     * @param array $postData
+     * @return string
+     */
+    private function sendAuthRequest(
+        string $method,
+        string $url,
+        string $oauth_token,
+        string $oauth_token_secret,
+        array $params = [],
+        array $postData = []
+    ): string {
+
+        // Basic request header data
+        $headers['oauth_consumer_key'] = $this->oauth_consumer_key;
+        $headers['oauth_nonce'] = $this->token->generateCheap(16);
+        $headers['oauth_signature_method'] = $this->oauth_signature_method;
+        $headers['oauth_timestamp'] = time();
+        $headers['oauth_token'] = $oauth_token;
+        $headers['oauth_version'] = $this->oauth_version;
+
+        // Add signature to header data
+        $headers['oauth_signature'] = $this->createSignature($method, $url, $oauth_token_secret, $headers, $params, $postData);
+        $headers = $this->prepareAuthHeader($headers);
+
+        // Send HTTP request and get response
+        $url = $params ? $url . '?' . http_build_query($params) : $url;
+        $req = $this->curlHttpClient->prepareRequest($url);
+        $req->headers($headers);
+        if ($postData && $method == 'POST') {
+            $req->postData($postData);
+        }
+        $res = $this->curlHttpClient->send($req);
+        if ($res->isOk()) {
+            return $res->body();
         }
 
         return $res->errMessage();
@@ -197,17 +281,18 @@ class OAuth1Client
      */
     private function getRequestToken()
     {
-        // Prepare OAuth HTTP header
-        $data = $this->prepareData();
-        $data = $this->addSignature($data, $this->oauth_request_token_url);
-        $headers = $this->prepareAuthHeader($data);
+        // Basic request header data
+        $headers = $this->prepareData();
+
+        // Add signature to header data
+        $headers['oauth_signature'] = $this->createSignature('POST', $this->oauth_request_token_url, $this->oauth_signature_secret, $headers);
+        $headers = $this->prepareAuthHeader($headers);
 
         // Send HTTP request and get request_token
         $req = $this->curlHttpClient->prepareRequest($this->oauth_request_token_url);
         $req->method('POST');
         $req->headers($headers);
         $res = $this->curlHttpClient->send($req);
-
         if ($res->isOk()) {
             parse_str($res->body(), $body);
             return $body;
@@ -236,23 +321,49 @@ class OAuth1Client
             $data['oauth_token'] = $oauth_token;
         }
 
-        ksort($data);
-
         return $data;
     }
 
+
     /**
      * Generate OAuth1 signature and add it to array data
-     * @param array $data
+     * @param string $method
      * @param string $url
-     * @return array
+     * @param string $secret
+     * @param array $headers
+     * @param array $urlParams
+     * @param array $postData
+     * @return string
      */
-    private function addSignature(array $data, string $url): array
-    {
-        $signData = 'POST&' . urlencode($url) . '&' . urlencode(http_build_query($data));
-        $signKey = urlencode($this->oauth_consumer_secret) . '&' . urlencode($this->oauth_signature_secret);
-        $data['oauth_signature'] = base64_encode(hash_hmac('sha1', $signData, $signKey, true));
-        return $data;
+    private function createSignature(
+        string $method,
+        string $url,
+        string $secret,
+        array $headers,
+        array $urlParams = [],
+        array $postData = []
+    ): string {
+        // Prepare parameters for parameter string
+        $parameters = $headers + $urlParams + $postData;
+        ksort($parameters);
+
+        // Prepare parameter string
+        $parameterString = '';
+        foreach ($parameters as $key => $val) {
+            $parameterString .= urlencode((string)$key) . '=' . urlencode((string)$val) . '&';
+        }
+        $parameterString = rtrim($parameterString, '&');
+
+        // Prepare signature base string
+        $baseString = strtoupper($method) . '&';
+        $baseString .= urlencode($url) . '&';
+        $baseString .= urlencode($parameterString);
+
+        // Prepare signing key
+        $signingKey = urlencode($this->oauth_consumer_secret) . '&' . urlencode($secret);
+
+        // Calculate the signature
+        return base64_encode(hash_hmac('sha1', $baseString, $signingKey, true));
     }
 
     /**
