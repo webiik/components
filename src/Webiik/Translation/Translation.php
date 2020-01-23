@@ -39,6 +39,13 @@ class Translation
      */
     private $parsers = [];
 
+
+    /**
+     * Dependencies of parsers
+     * @var array
+     */
+    private $injections = [];
+
     /**
      * @param Arr $arr
      */
@@ -54,6 +61,16 @@ class Translation
     public function setLang(string $lang): void
     {
         $this->lang = $lang;
+    }
+
+    /**
+     * Inject dependencies to specific parser
+     * @param string $parserClassName
+     * @param TranslationInjector $injector
+     */
+    public function inject(string $parserClassName, TranslationInjector $injector): void
+    {
+        $this->injections[$parserClassName] = $injector;
     }
 
     /**
@@ -118,41 +135,41 @@ class Translation
     }
 
     /**
-     * Get translation by key and add missing keys, contexts to this->missing array
+     * Get translation by key. Add missing keys, contexts to this->missing array
      * @param string $key
-     * @param array|null $context
+     * @param array|bool|null $parse
      * @return array|string
      */
-    public function get(string $key, $context = null)
+    public function get(string $key, $parse = null)
     {
         if (!$this->arr->isIn($this->lang . '.' . $key, $this->translation)) {
             $this->addMissingKey($key);
             return '';
         }
 
-        if ($context === null) {
+        if ($parse === null || $parse === false) {
             return $this->arr->get($key, $this->translation[$this->lang]);
         }
 
-        return $this->getParsed($key, $this->arr->get($key, $this->translation[$this->lang]), $context);
+        return $this->getParsed($key, $this->arr->get($key, $this->translation[$this->lang]), $parse);
     }
 
     /**
      * Get all translations and add missing contexts to this->missing array
-     * @param array|null $context
+     * @param array|bool|null $parse
      * @return array
      */
-    public function getAll($context = null): array
+    public function getAll($parse = null): array
     {
         if (!isset($this->translation[$this->lang])) {
             return [];
         }
 
-        if ($context === null) {
+        if ($parse === null || $parse === false) {
             return $this->translation[$this->lang];
         }
 
-        return $this->getParsed('', $this->translation[$this->lang], $context);
+        return $this->getParsed('', $this->translation[$this->lang], $parse);
     }
 
     /**
@@ -169,11 +186,15 @@ class Translation
      * Parse translation and add missing contexts
      * @param string $key
      * @param string|array $input
-     * @param array $context
+     * @param bool|array $context
      * @return string|array
      */
-    private function getParsed(string $key, $input, array $context)
+    private function getParsed(string $key, $input, $context)
     {
+        if ($context === true) {
+            $context = [];
+        }
+
         if (is_array($input)) {
             // Translation input is an array, respond with array
             foreach ($input as $ikey => $val) {
@@ -190,30 +211,76 @@ class Translation
 
             $brackets = $this->extractBrackets($input, true);
             foreach ($brackets as $bracket => $val) {
-                // Get from bracket: var name, parser name and parser string
+                // Get from bracket: var name, parser class name and parser string
                 preg_match('/^([^,]+),?\s?(\w+)?,?\s?(.*)$/', $bracket, $match);
 
-                // If context contains var from bracket, parse bracket
-                if (isset($context[$match[1]]) && !is_array($context[$match[1]])) {
-                    // If parser name is not set, it means it's simple bracket, use Basic parser
-                    $match[2] = $match[2] ? $match[2] : 'Basic';
-                    $parser = $this->getParser($match[2]);
-                    $parsedBracket = $parser->parse($context[$match[1]], $match[3]);
+                // Determine bracket style...
+                if ($match[0] && $match[1]) {
+                    if (!$match[2]) {
+                        if (!$match[3]) {
+                            // Simple bracket
+                            // {varName}
+                            // varName - $match[0], $match[1]
 
-                    // Parse basic brackets inside advanced brackets
-                    if ($match[2] != 'Basic') {
-                        $parsedBracket = $this->parseBasicBrackets(
-                            $key,
-                            $parsedBracket,
-                            $context,
-                            $missingContext
-                        );
+                            // If context contains varName from bracket, parse bracket
+                            if (isset($context[$match[1]]) && !is_array($context[$match[1]])) {
+                                $parser = $this->getParser('Basic');
+                                $parsedBrackets['{' . $bracket . '}'] = $parser->parse($context[$match[1]], '');
+                            } else {
+                                // Add missing context
+                                $missingContext[$key][] = $match[1];
+                            }
+
+                        } else {
+                            // Short bracket
+                            // {parserClassName, stringToParse}
+                            // parserClassName - $match[1]
+                            // stringToParse - $match[3]
+
+                            // If context contains varName from bracket, parse bracket
+                            $parser = $this->getParser($match[1]);
+                            $parsedBracket = $parser->parse('', $match[3]);
+
+                            // Parse basic brackets inside advanced brackets
+                            $parsedBracket = $this->parseBasicBrackets(
+                                $key,
+                                $parsedBracket,
+                                $context,
+                                $missingContext
+                            );
+
+                            $parsedBrackets['{' . $bracket . '}'] = $parsedBracket;
+                        }
+
+                    } else {
+                        if ($match[3]) {
+                            // Standard bracket
+                            // {varName, parserClassName, stringToParse}
+                            // varName - $match[1]
+                            // parserClassName - $match[2]
+                            // stringToParse - $match[3]
+
+                            // If context contains varName from bracket, parse bracket
+                            if (isset($context[$match[1]]) && !is_array($context[$match[1]])) {
+                                $parser = $this->getParser($match[2]);
+                                $parsedBracket = $parser->parse($context[$match[1]], $match[3]);
+
+                                // Parse basic brackets inside advanced brackets
+                                $parsedBracket = $this->parseBasicBrackets(
+                                    $key,
+                                    $parsedBracket,
+                                    $context,
+                                    $missingContext
+                                );
+
+                                $parsedBrackets['{' . $bracket . '}'] = $parsedBracket;
+
+                            } else {
+                                // Add missing context
+                                $missingContext[$key][] = $match[1];
+                            }
+                        }
                     }
-
-                    $parsedBrackets['{' . $bracket . '}'] = $parsedBracket;
-                } else {
-                    // Add missing context
-                    $missingContext[$key][] = $match[1];
                 }
             }
 
@@ -284,10 +351,20 @@ class Translation
     private function getParser(string $className): ParserInterface
     {
         if (isset($this->parsers[$className])) {
+            // Get instantiated parser
             $parser = $this->parsers[$className];
         } else {
+            // Instantiate parser
             $parserName = '\Webiik\Translation\Parser\\' . $className;
-            $parser = new $parserName();
+
+            if (isset($this->injections[$className])) {
+                // Parser with dependencies
+                $parser = new $parserName(...$this->injections[$className]());
+            } else {
+                // Parser without dependencies
+                $parser = new $parserName();
+            }
+
             $this->parsers[$className] = $parser;
         }
         return $parser;

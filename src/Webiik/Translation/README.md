@@ -38,6 +38,17 @@ setLang(string $lang): void
 $translation->setLang('en');
 ```
 
+### inject
+```php
+inject(string $parserClassName, TranslationInjector $injector): void
+```
+**inject()** injects dependencies to specific parser. It is useful when you make your custom parser and you need to inject some external dependencies.  
+```php
+$translation->inject('Route', new \Webiik\Translation\TranslationInjector(function () use (&$router) {
+    return [$router];
+}));
+```
+
 Adding
 ------
 ### add
@@ -70,7 +81,7 @@ Getting
 -------
 ### get
 ```php
-get(string $key, $context = null)
+get(string $key, array|bool|null $parse = null): string|array
 ```
 **get()** gets translation by key. Key supports dot notation. If key is missing it returns empty string. After calling, all missing keys and contexts can be obtained with method **getMissing()**.
 ```php
@@ -79,7 +90,7 @@ $translation->get('greeting', ['name' => 'Kitty']);
 
 ### getAll
 ```php
-getAll($context = null): array
+getAll(array|bool|null $parse = null): array
 ```
 **getAll()** gets all translations. After calling, all missing contexts can be obtained with method **getMissing()**.
 ```php
@@ -95,8 +106,8 @@ getMissing(): array
 $missing = $translation->$arr->getMissing();
 ```
 
-Translation Formatting
-----------------------
+Parsing
+-------
 Translations can contain special formatting which help to update translation values on the fly.
 
 #### Basic Syntax
@@ -112,36 +123,52 @@ echo $translation->get('greeting', ['name' => 'Kitty']);
 
 #### Plural Syntax
 ```
-{variableName, Plural, =int {message}...}
+{variableName, Plural, {condition message}...}
 ```
-Sometimes a translation depends on some specific count. **Int** represents that count, allowed values are: **-int, int-int, int+** 
+Sometimes a translation depends on some specific count. **Int** represents that count, allowed values are: **int, int-int, int-, int+** 
 ```php
-$translation->add('playful-cats', '{numCats, Plural, =0 {No cat wants} =1 {One cat wants} =2-10 {{numCats} cats want} =11+ {A lot of cats want}} to play.');
-echo $translation->get('playful-cats', ['numCats' => 2]);
-// 2 cats want to play.
+$translation->add('cats', '{numCats, Plural, {0- No cats.} {1 One cat.} {2+ {numCats} cats.}}');
+echo $translation->get('cats', ['numCats' => 2]);
+// 2 cats.
 ```
 
 #### Select Syntax
 ```
-{variableName, Select, =string {message}...}
+{variableName, Select, {condition message}...}
 ```
 Sometimes a translation depends on some specific value. In the select syntax, **string** represents that value. 
 ```php
-$translation->add('cat-gender', '{gender, Select, =tomcat {He is {gender}} =cat {She is {gender}}}.');
-echo $translation->get('cat-gender', ['gender' => 'tomcat']);
-// He is tomcat.
+$translation->add('hello-cat', '{gender, Select, {male Hello Tom!} {female Hello Kitty!}}');
+echo $translation->get('hello-cat', ['gender' => 'male']);
+// Hello Tom!
 ```
 
-#### Custom Formatter Syntax
+#### Link Syntax
+```
+{Link, {link text} {url} {target} {rel}}
+```
+Sometimes a translation depends on some specific value. In the select syntax, **string** represents that value. 
+```php
+$translation->add('link', 'Visit the {Link, {official page} {https://www.webiik.com} {_blank} {nofollow}}.');
+echo $translation->get('link', true);
+// Visit the <a href="https://www.webiik.com" target="_blank" rel="nofollow">official website</a>.
+```
+> ⚠️ Notice the true parameter when calling the method `get`. Without it, the link would be not generated, and the text of translation would be displayed in the original format. 
+
+#### Custom Parser Syntax
 ```
 {variableName, FormatterClassName, formatter syntax}
 ```
-You can write your own formatter. Every custom formatter must: 
+or
+```
+{FormatterClassName, formatter syntax}
+```
+You can write your own parser. Every custom parser must: 
 * be compatible with the syntax above
 * implement **Webiik\Translation\Parser\ParserInterface.php**
 * use namespace **Webiik\Translation\Parser**
 
-Look at [Select](Parser/Select.php) formatter to get better insight.  
+Look at [Select](Parser/Select.php) parser to get better insight.  
 
 Resources
 ---------
