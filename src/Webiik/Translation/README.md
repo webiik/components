@@ -123,9 +123,9 @@ echo $translation->get('greeting', ['name' => 'Kitty']);
 
 #### Plural Syntax
 ```
-{variableName, Plural, {condition message}...}
+{variableName, Plural, {int message}...}
 ```
-Sometimes a translation depends on some specific count. **Int** represents that count, allowed values are: **int, int-int, int-, int+** 
+Sometimes a translation depends on some specific count. **Int** allowed values are: **int, int-int, int-, int+** 
 ```php
 $translation->add('cats', '{numCats, Plural, {0- No cats.} {1 One cat.} {2+ {numCats} cats.}}');
 echo $translation->get('cats', ['numCats' => 2]);
@@ -147,7 +147,7 @@ echo $translation->get('hello-cat', ['gender' => 'male']);
 ```
 {Link, {link text} {url} {target} {rel}}
 ```
-Sometimes a translation depends on some specific value. In the select syntax, **string** represents that value. 
+If you need to generate links and don't want to use HTML. 
 ```php
 $translation->add('link', 'Visit the {Link, {official page} {https://www.webiik.com} {_blank} {nofollow}}.');
 echo $translation->get('link', true);
