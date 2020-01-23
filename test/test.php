@@ -289,22 +289,35 @@ $newArr = [
         'name' => 'Miau {name} from {city}',
         'mr' => 'Miau {gender, select, =male {Mr.} =female {Mrs.}} {name}',
     ],
-    'cats' => '{numCats, Plural, =-2-0 {No cat has} =1 {One cat has} =2+ {{numCats} cats have}} birthday.',
-    'ice-cream' => '{gender, Select, =male {He {name}} =female {She}} likes vanilla ice cream.',
+    'name' => 'Miau {name} from {city}.',
+    'cats' => '{numCats, Plural, {0- No cat has} {1 One cat has} {2+ {numCats} cats have}} birthday.',
+    'ice-cream' => '{gender, Select, {male He, =male {name}} {female {She}}} likes vanilla ice cream.',
+    'route' => 'Go back to {Route, {Home Page} {home} {_blank}}.',
+    'link' => 'Visit the {Link, {official website} {https://www.webiik.com} {_blank}}.',
 ];
 $translation = new \Webiik\Translation\Translation($arr);
 $translation->addArr($array);
 $translation->addArr($newArr);
 //$arr->set('colors.blue', 'blau', $array);
 //$arr->set('hello', 'hallo', $array);
-//print_r($translation->getAll([]));
 echo 'Translated text: <br/>';
-//print_r($translation->get('hello.name', ['name' => ['name' => 'Dolly', 'city' => 'Prague']]));
-//print_r($translation->get('cats', ['numCats' => 4]));
+print_r($translation->get('cats', ['numCats' => -3]));
+echo '<br/>';
 print_r($translation->get('ice-cream', ['gender' => 'male', 'name' => 'Peter']));
+echo '<br/>';
 //print_r($translation->get('hello.name', ['name' => 'Dolly']));
 //print_r($translation->get('hello.name', ['city' => 'Prague']));
+//print_r($translation->getAll());
+//print_r($translation->getAll(true));
+print_r($translation->get('name', ['name' => 'Dolly', 'city' => 'Prague']));
 echo '<br/>';
+print_r($translation->get('link', true));
+echo '<br/>';
+//$translation->inject('Route', new \Webiik\Translation\TranslationInjector(function () use (&$router) {
+//    return [$router];
+//}));
+//print_r($translation->get('route', true));
+//echo '<br/>';
 echo 'Missing keys and contexts: ';
 print_r($translation->getMissing());
 echo '<br/><br/>';
@@ -322,7 +335,7 @@ echo '<br/><br/>';
 
 // Test View
 echo '<b>View</b></br>';
-$container->addService('\Webiik\View\View', function () {
+$container->addService('\Webiik\View\View', function (\Webiik\Container\Container $c) {
     $view = new \Webiik\View\View();
     $view->setRenderer(function () {
         // Set Twig basic settings
@@ -341,7 +354,7 @@ $container->addService('\Webiik\View\View', function () {
 });
 /** @var \Webiik\View\View $view */
 $view = $container->get('\Webiik\View\View');
-echo $view->render('test.twig', ['name' => 'Dolly']);
+echo $view->render('test.twig', ['name' => 'Dolly', 'link' => $translation->get('route', true)]);
 
 // Test Validator
 echo '<b>Validator</b></br>';
