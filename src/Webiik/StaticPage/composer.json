@@ -1,0 +1,25 @@
+{
+  "name": "webiik/staticpage",
+  "type": "library",
+  "description": "The StaticPage allows you to generate static pages.",
+  "keywords": ["static", "site", "page"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\StaticPage\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
