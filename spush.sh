@@ -18,6 +18,7 @@ git subtree push --prefix=src/Webiik/OAuth1Client OAuth1Client master --squash
 git subtree push --prefix=src/Webiik/OAuth2Client OAuth2Client master --squash
 git subtree push --prefix=src/Webiik/Privileges Privileges master --squash
 git subtree push --prefix=src/Webiik/Router Router master --squash
+git subtree push --prefix=src/Webiik/StaticPage StaticPage master --squash
 git subtree push --prefix=src/Webiik/Session Session master --squash
 git subtree push --prefix=src/Webiik/Token Token master --squash
 git subtree push --prefix=src/Webiik/Translation Translation master --squash
