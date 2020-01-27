@@ -5,7 +5,7 @@
 
 StaticPage
 ==========
-The StaticPage allows you to generate static pages from your dynamic PHP pages. It is designed to be used inside any route controller and to serve static files using the NGiNX or other web servers.
+The StaticPage allows generating static content from almost any PHP app on the fly. It is designed to be used inside any route controller and to serve static files using the NGiNX or another web server.
 
 Installation
 ------------
@@ -13,9 +13,9 @@ Installation
 composer require webiik/staticpage
 ```
 
-Example
--------
-To make StaticPage work, follow these steps:
+How To Steps
+------------
+To make StaticPage work, follow these two steps:
 
 1. Update your route controller(s):
 
@@ -29,9 +29,9 @@ To make StaticPage work, follow these steps:
         // Page template
         $page = '<h1>Meow World!</h1>';
     
-        // Generate static files the web server will try to serve with every next request  
+        // Save static file the web server will try to serve with every next request  
         $staticPage = new Webiik\StaticPage\StaticPage();
-        $staticPage->makeStatic($page, $uri);
+        $staticPage->save($page, $uri);
     
         // Show dynamic page when the server didn't serve the static page  
         echo $page;
@@ -39,42 +39,50 @@ To make StaticPage work, follow these steps:
     ```
    
 2. Update your web server configuration (NGiNX example):
-* Add `/_site${uri}index.html` add the beginning of your `try_files` directive in the main `location`. It tells NGiNX to try to serve static files at first. Eg:
+* Add `/_site${uri} /_site${uri}index.html` to the beginning of your `try_files` directive in the main `location`. It tells NGiNX to try to serve static files at first. Eg:
     ```nginx
     location / {
-        try_files /_site${uri}index.html $uri $uri/ /index.php?$query_string;
-    }
-    ```
-* Add new location block for HTML files and set new root:
-    ```nginx
-    # Set different root for static HTML files
-    location ~ \.html$ {
-        root /your/web/root/dir/_site/;
-        try_files $uri =404;
+        try_files /_site${uri} /_site${uri}index.html $uri $uri/ /index.php?$query_string;
     }
     ```
 * Check the configuration and restart the server.
 
 Configuration
 -------------
-### setBaseDir
+### setDir
 ```php
-setBaseDir(string $baseDir): void
+setDir(string $dir): void
 ```
-**set()** sets a directory where all generated static files will be stored. Default directory is **_site**.
+**setDir()** sets a relative path to where all generated static files will be stored. Default path is **./_site**.
 ```php
-$staticPage->setBaseDir('_site');
+$staticPage->setDir('./_site');
 ```
 
 Generating
 ----------
-### makeStatic
+### save
 ```php
-makeStatic(string $html, string $uri): void
+save(string $data, string $uri, string $file = 'index.html'): void
 ```
-**makeStatic()** creates directory structure according to **$uri** and inside it stores index.html with the content of **$html**. It is then served by the web server instead of the dynamic page.
+**save()** creates directory structure according to **$uri** and inside it saves **$file** with the content of **$data**.
 ```php
-$staticPage->makeStatic('<h1>Meow World!</h1>', '/foo/bar/');
+$staticPage->save('<h1>Meow World!</h1>', '/foo/bar/');
+```
+
+Deleting
+--------
+### delete
+> ⚠️ Be very careful when using this method.
+```php
+delete(string $dir, bool $test = true): void
+```
+**delete()** deletes $dir and all it contents. When $test mode is set to true, it only printouts files to be deleted but doesn't delete them.
+```php
+$staticPage->delete();
+```
+This method can be called from CLI. It accept two arguments **$dir** and **$test**. 
+```shell script
+php StaticPage.php /absolute/path/to/static/_site true
 ```
 
 Resources
