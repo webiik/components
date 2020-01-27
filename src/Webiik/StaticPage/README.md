@@ -74,9 +74,9 @@ Deleting
 ### delete
 > ⚠️ Be very careful when using this method.
 ```php
-delete(string $dir, bool $test = true): void
+delete(bool $test = true): void
 ```
-**delete()** deletes $dir and all it contents. When $test mode is set to true, it only printouts files to be deleted but doesn't delete them.
+**delete()** deletes content of **$dir**. When **$test** mode is set to true, it only printouts files to be deleted but doesn't delete them.
 ```php
 $staticPage->delete();
 ```

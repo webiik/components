@@ -48,7 +48,7 @@ class StaticPage
     }
 
     /**
-     * Delete $baseDir and all it contents.
+     * Delete content of $this->dir
      * ! Be very careful when using this method !
      * @param bool $test Do only test of deletion, don't delete files.
      */
@@ -84,12 +84,6 @@ class StaticPage
                     return;
                 }
             }
-        }
-
-        if ($test) {
-            echo 'Remove $dir: ' . $this->dir . "\r\n";
-        } else {
-            @rmdir($this->dir);
         }
     }
 
