@@ -46,7 +46,8 @@ if [[ "$#" == 1 ]]; then
 
 		cd ~/webiik-repos/${dir}
 
-		repo=$(echo ${dir} | tr '[:upper:]' '[:lower:]')
+    repo=$(echo ${dir} | perl -pe 's/([a-z]|[0-9])([A-Z])/\1-\2/g')
+		repo=$(echo ${repo} | tr '[:upper:]' '[:lower:]')
 
 		git remote add origin https://github.com/webiik/${repo}.git
 
@@ -58,7 +59,7 @@ if [[ "$#" == 1 ]]; then
 
 		git branch -D ${dir}
 
-		git subtree push --prefix=src/Webiik/${dir} ${dir} master --squash
+		git subtree push --prefix=src/Webiik/${dir} https://github.com/webiik/${repo}.git master --squash
 	done
 fi
 
@@ -91,7 +92,8 @@ if [[ "$#" > 1 ]]; then
 
 		cd ~/webiik-repos/${dir}
 
-		repo=$(echo ${dir} | tr '[:upper:]' '[:lower:]')
+		repo=$(echo ${dir} | perl -pe 's/([a-z]|[0-9])([A-Z])/\1-\2/g')
+		repo=$(echo ${repo} | tr '[:upper:]' '[:lower:]')
 
 		git remote add origin https://github.com/webiik/${repo}.git
 
@@ -103,6 +105,6 @@ if [[ "$#" > 1 ]]; then
 
 		git branch -D ${dir}
 
-		git subtree push --prefix=src/Webiik/${dir} ${dir} master --squash
+		git subtree push --prefix=src/Webiik/${dir} https://github.com/webiik/${repo}.git master --squash
 	done
 fi
