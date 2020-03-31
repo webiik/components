@@ -92,7 +92,7 @@ try {
 
 Writing Your Custom Account 
 ---------------------------
-To write your account implementation you have to extend from abstract class [AccountBase](AccountBase.php) and write your own implementation of methods **auth, signup, update, disable, delete, createActivation, activate, createPasswordReset** and **resetPassword**. Don't forget to incorporate authentication [namespace](#setnamespace) to each method. Read below intended function of each mentioned method and adapt your implementation to it.
+To write your account implementation you have to extend from abstract class [AccountBase](AccountBase.php) and write your own implementation of methods **auth, signup, update, disable, delete, createToken, activate** and **resetPassword**. Don't forget to incorporate authentication [namespace](#setnamespace) to each method. Read below intended function of each mentioned method and adapt your implementation to it.
  
 ### auth
 ```php
@@ -145,7 +145,7 @@ try {
 
 ### disable
 ```php
-disable(int $uid, int $reason): User
+disable(int $uid, int $reason, array $data = []): User
 ```
 **disable()** sets account status to ACCOUNT_IS_DISABLED or ACCOUNT_IS_BANNED on account with id **uid**. On success returns [User](#user), on error throws [AccountException](#account-exception). Possible exception status codes: METHOD_IS_NOT_IMPLEMENTED, ACCOUNT_DOES_NOT_EXIST, FAILURE
 ```php
@@ -158,7 +158,7 @@ try {
 
 ### delete
 ```php
-delete(int $uid): User
+delete(int $uid, array $data = []): User
 ```
 **delete()** deletes an account with id **uid**. On success returns [User](#user), on error throws [AccountException](#account-exception). Possible exception status codes: METHOD_IS_NOT_IMPLEMENTED, ACCOUNT_DOES_NOT_EXIST, FAILURE
 ```php

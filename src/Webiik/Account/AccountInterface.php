@@ -58,10 +58,11 @@ interface AccountInterface
      *
      * @param int $uid
      * @param int $reason
+     * @param array $data
      * @throws AccountException
      * @return User
      */
-    public function disable(int $uid, int $reason): User;
+    public function disable(int $uid, int $reason, array $data = []): User;
 
     /**
      * Delete an account with id $uid.
@@ -71,10 +72,11 @@ interface AccountInterface
      * METHOD_IS_NOT_IMPLEMENTED, ACCOUNT_DOES_NOT_EXIST, FAILURE
      *
      * @param int $uid
+     * @param array $data
      * @throws AccountException
      * @return User
      */
-    public function delete(int $uid): User;
+    public function delete(int $uid, array $data = []): User;
 
     /**
      * Create and return time limited security token.

@@ -73,20 +73,22 @@ abstract class AccountBase implements AccountInterface
     /**
      * @param int $uid
      * @param int $reason
+     * @param array $data
      * @return User
      * @throws AccountException
      */
-    public function disable(int $uid, int $reason): User
+    public function disable(int $uid, int $reason, array $data = []): User
     {
         throw new AccountException('Method disable() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }
 
     /**
      * @param int $uid
+     * @param array $data
      * @return User
      * @throws AccountException
      */
-    public function delete(int $uid): User
+    public function delete(int $uid, array $data = []): User
     {
         throw new AccountException('Method delete() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
     }

@@ -82,20 +82,22 @@ class Account implements AccountInterface
     /**
      * @param int $uid
      * @param int $reason
+     * @param array $data
      * @return User
      * @throws AccountException
      */
-    public function disable(int $uid, int $reason): User
+    public function disable(int $uid, int $reason, array $data = []): User
     {
         return $this->getAccount()->disable($uid, $reason);
     }
 
     /**
      * @param int $uid
+     * @param array $data
      * @return User
      * @throws AccountException
      */
-    public function delete(int $uid): User
+    public function delete(int $uid, array $data = []): User
     {
         return $this->getAccount()->delete($uid);
     }
