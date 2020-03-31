@@ -24,6 +24,7 @@ Components
 * [Privileges](./src/Webiik/Privileges)
 * [Router](./src/Webiik/Router)
 * [Session](./src/Webiik/Session)
+* [StaticPage](./src/Webiik/StaticPage)
 * [Token](./src/Webiik/Token)
 * [Translation](./src/Webiik/Translation)
 * [Validator](./src/Webiik/Validator)
