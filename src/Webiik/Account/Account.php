@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Webiik\Account;
 
-class Account implements AccountInterface
+class Account extends AccountBase
 {
     /**
      * @var array
