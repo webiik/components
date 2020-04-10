@@ -16,11 +16,6 @@ class Account extends AccountBase
     private $currentAccount;
 
     /**
-     * @var string
-     */
-    private $namespace = '';
-
-    /**
      * Add an implementation of account
      * @param string $name
      * @param callable $accountFactory
