@@ -162,8 +162,8 @@ updateAutoLogoutTs(): void
 ```
 **updateAutoLogoutTs()** updates time of last users' activity stored in the session.
 ```php
-// Never call this before isLogged or isAuthorized, it would 
-// let to the situation, that the user was never logged out
+// Never call this before isLogged, it would lead 
+// to the situation, that the user was never logged out
 $login->updateAutoLogoutTs();
 ```
 

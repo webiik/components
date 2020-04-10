@@ -32,7 +32,7 @@ class Login
     private $sessionKey = 'logged';
 
     /**
-     * User id from last login check using methods: isLogged. isAuthorised
+     * User id from last login check using method isLogged
      * @var int|string
      */
     private $uid;
@@ -282,8 +282,8 @@ class Login
      * actively interacts with the app to make auto-logout feature working properly.
      *
      * Warning:
-     * Never update timestamp before calling isLogged or isAuthorised method then
-     * user would be never automatically logged out.
+     * Never update timestamp before calling isLogged method user would be never
+     * automatically logged out.
      */
     public function updateAutoLogoutTs(): void
     {
