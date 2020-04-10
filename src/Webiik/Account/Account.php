@@ -59,6 +59,16 @@ class Account implements AccountInterface
     }
 
     /**
+     * @param string $uid
+     * @return User
+     * @throws AccountException
+     */
+    public function reAuth(string $uid): User
+    {
+        return $this->getAccount()->reAuth($uid);
+    }
+
+    /**
      * @param array $credentials
      * @return User
      * @throws AccountException

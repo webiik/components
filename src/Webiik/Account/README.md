@@ -111,6 +111,19 @@ try {
 ```
 > To compare passwords, always use secure method `verifyPassword(string $password, string $hash): bool` provided by [AccountBase](#writing-your-custom-account).
 
+### reAuth
+```php
+reAuth(string $uid): User
+```
+**reAuth()** re-authenticates a user by unique user identifier **uid**. On success returns [User](#user), on error throws [AccountException](#account-exception). Possible exception status codes: METHOD_IS_NOT_IMPLEMENTED, ACCOUNT_DOES_NOT_EXIST, ACCOUNT_IS_NOT_ACTIVATED, ACCOUNT_IS_BANNED, ACCOUNT_IS_DISABLED, FAILURE 
+```php
+try {
+    $user = $this->account->reAuth('d4rjke8');
+} catch (AccountException $e) {
+    echo $e->getMessage();
+}
+```
+
 ### signup
 ```php
 signup(array $credentials): User

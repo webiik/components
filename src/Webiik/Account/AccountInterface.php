@@ -21,6 +21,21 @@ interface AccountInterface
     public function auth(array $credentials): User;
 
     /**
+     * Re-authenticate a user by unique user identifier.
+     * On success returns User, on error throw AccountException.
+     *
+     * Possible exception status codes:
+     * METHOD_IS_NOT_IMPLEMENTED
+     * ACCOUNT_DOES_NOT_EXIST, ACCOUNT_IS_NOT_ACTIVATED, ACCOUNT_IS_BANNED,
+     * ACCOUNT_IS_DISABLED, FAILURE
+     *
+     * @param string $uid
+     * @throws AccountException
+     * @return User
+     */
+    public function reAuth(string $uid): User;
+
+    /**
      * Sign up a user with $credentials.
      * On success return User, on error throw AccountException.
      *

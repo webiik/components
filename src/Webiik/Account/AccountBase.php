@@ -50,6 +50,16 @@ abstract class AccountBase implements AccountInterface
     }
 
     /**
+     * @param string $uid
+     * @return User
+     * @throws AccountException
+     */
+    public function reAuth(string $uid): User
+    {
+        throw new AccountException('Method reAuth() is not implemented.', self::METHOD_IS_NOT_IMPLEMENTED);
+    }
+
+    /**
      * @param array $credentials
      * @return User
      * @throws AccountException
