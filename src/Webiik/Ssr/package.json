@@ -2,29 +2,32 @@
   "name": "@webiik/render-js-components",
   "version": "1.0.0",
   "description": "Render JS components within PHP.",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/webiik/ssr.git"
-  },
-  "author": {
-    "email": "jiri@mihal.me",
-    "name": "Jiri Mihal",
-    "url": "mihal.me"
-  },
+  "main": "Js/build/registerReactComponent.js",
   "files": [
     "Js/build"
   ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webiik/ssr.git"
+  },
   "keywords": [
     "webiik",
     "php",
-    "react",
-    "vue",
     "server",
     "side",
     "rendering",
     "ssr"
   ],
+  "author": {
+    "email": "jiri@mihal.me",
+    "name": "Jiri Mihal",
+    "url": "mihal.me"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/webiik/ssr",
   "devDependencies": {
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
