@@ -33,7 +33,7 @@ To make StaticPage work, follow these two steps:
         $staticPage = new Webiik\StaticPage\StaticPage();
         $staticPage->save($page, $uri);
     
-        // Show dynamic page when the server didn't serve the static page  
+        // Show dynamic page when the server didn't find the static page  
         echo $page;
     }
     ```
