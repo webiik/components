@@ -33,10 +33,5 @@
   "dependencies": {
     "react": "^16.13.0",
     "react-dom": "^16.13.0"
-  },
-  "scripts": {
-    "dev": "webpack -d --colors --progress",
-    "watch": "webpack -d --watch --colors --progress",
-    "prod": "webpack -p --colors --progress"
   }
 }
