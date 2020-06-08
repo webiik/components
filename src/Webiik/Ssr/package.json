@@ -1,0 +1,42 @@
+{
+  "name": "webiik-render-js",
+  "version": "1.0.0",
+  "description": "Render JS components within PHP.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/webiik/ssr.git"
+  },
+  "author": {
+    "email": "jiri@mihal.me",
+    "name": "Jiri Mihal",
+    "url": "mihal.me"
+  },
+  "files": [
+    "Js/build"
+  ],
+  "keywords": [
+    "webiik",
+    "php",
+    "react",
+    "vue",
+    "server",
+    "side",
+    "rendering",
+    "ssr"
+  ],
+  "devDependencies": {
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
+    "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  },
+  "scripts": {
+    "dev": "webpack -d --colors --progress",
+    "watch": "webpack -d --watch --colors --progress",
+    "prod": "webpack -p --colors --progress"
+  }
+}

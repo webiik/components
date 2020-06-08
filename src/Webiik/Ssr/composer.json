@@ -1,0 +1,25 @@
+{
+  "name": "webiik/ssr",
+  "type": "library",
+  "description": "Server-side rendering of javascript UI components from PHP.",
+  "keywords": ["ssr", "server side rendering", "react", "vue", "js", "javascript"],
+  "homepage": "https://www.webiik.com",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jiri Mihal",
+      "email": "jiri@mihal.me"
+    }
+  ],
+  "require": {
+    "php": ">=7.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Webiik\\Ssr\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
