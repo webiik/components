@@ -1,7 +1,7 @@
 {
   "name": "webiik/components",
-  "description": "Webiik components for lean web development with minimal dependencies.",
-  "keywords": ["components", "webiik"],
+  "description": "Set of ultralight PHP components for modern web development.",
+  "keywords": ["web", "development", "components", "webiik"],
   "homepage": "https://www.webiik.com",
   "license": "MIT",
   "authors": [
@@ -40,6 +40,8 @@
     "webiik/oauth2client": "self.version",
     "webiik/privileges": "self.version",
     "webiik/router": "self.version",
+    "webiik/ssr": "self.version",
+    "webiik/staticpage": "self.version",
     "webiik/session": "self.version",
     "webiik/token": "self.version",
     "webiik/translation": "self.version",

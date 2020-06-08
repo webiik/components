@@ -1,6 +1,6 @@
 Webiik Components
 =================
-Webiik components for lean web development with minimal dependencies. Use them standalone or within Webiik Framework. 
+Set of ultralight PHP components for modern web development. 
 
 Components
 ----------
@@ -24,6 +24,7 @@ Components
 * [Privileges](./src/Webiik/Privileges)
 * [Router](./src/Webiik/Router)
 * [Session](./src/Webiik/Session)
+* [Ssr](./src/Webiik/Ssr)
 * [StaticPage](./src/Webiik/StaticPage)
 * [Token](./src/Webiik/Token)
 * [Translation](./src/Webiik/Translation)
