@@ -1,5 +1,5 @@
 {
-  "name": "webiik-render-js",
+  "name": "@webiik/render-js-components",
   "version": "1.0.0",
   "description": "Render JS components within PHP.",
   "license": "MIT",
