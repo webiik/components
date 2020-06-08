@@ -9,12 +9,10 @@ Server-side rendering of javascript UI components from PHP. Out of the box, it s
 
 Prerequisites
 -------------
-1. [NodeJS](https://nodejs.org/en/) or [phpv8](https://github.com/phpv8/v8js).
-2. Some JS bundler eg. Webpack.
-3. `webiik/ssr`: 
-```bash
-composer require webiik/ssr
-```
+1. [Composer](https://getcomposer.org)
+2. [NodeJS](https://nodejs.org/en/)
+3. (optional) [PHPV8JS](https://github.com/phpv8/v8js)
+4. Some JS bundler eg. [Webpack](https://webpack.js.org)
 
 Supports
 --------
@@ -29,61 +27,89 @@ UI libraries:
 
 Step-by-step Example
 --------------------
-1. Create a component.
+This example uses Webpack to bundle JS. You can use your favorite JS bundler. 
 
-    meow.tsx
-    ```tsx
+1. Create the `MyTest` folder with the following file structure.
+    ```console
+    .
+    ..
+    ├── package.json
+    ├── webpack.config.js
+    ├── meow.jsx
+    ├── index.js
+    └── index.php
+    ```
+   
+2. Inside `MyTest` folder install all necessary packages. 
+    ```shell script   
+    npm install react
+    npm install react-dom
+    npm install @webiik/render-js-components
+    composer require webiik/ssr      
+    ```
+
+3. Create a component.
+
+    Edit `meow.jsx` to:
+    ```jsx
     import * as React from 'react';
     
-    export const Meow = (props: { name: string }) => {
+    export const Meow = (props) => {
         return (<h1>Meow {props.name}!</h1>);
     }
     ```
-2. Register the component.
+   
+4. Register the component.
 
-    index.ts
-    ```ts
+    Edit `index.js` to:
+    ```js
     import {registerReactComponent} from 'registerReactComponent';
     import {Meow} from 'meow';
     
-    registerComponent({Meow});
+    registerReactComponent({Meow});
     ```
-3. Use your favorite [JS bundler](https://webpack.js.org) to bundle `index.ts` to `index.js`. *Remember, `index.js` MUST contain all code dependencies required to render the component with javascript.*    
-4. Render the component from PHP.
+5. Configure Webpack.
 
-    index.php
+    Edit `webpack.config.js` to:
+    ```js
+    const webpack = require('webpack');
+    const path = require('path');
+    module.exports = {
+        entry: {
+            'index': 'index.js'
+        },
+        output: {
+            filename: '[name].js',
+            path: path.resolve(__dirname + '/build/')
+        },
+        resolve: {
+            extensions: ['.js', '.jsx']
+        }        
+    };      
+    ```
+6. Bundle `index.js` to `build/index.js`. *Remember, `build/index.js` MUST contain all code dependencies required to render the component with javascript.*
+    ```shell script
+    webpack -p --colors --progress     
+    ```    
+7. Render the component from PHP.
+
+    Edit `index.php` to:
     ```php
     // Render the component on server
     $ssr = new \Webiik\Ssr\Ssr();
     $engine = new \Webiik\Ssr\Engines\NodeJs();
     $engine->setTmpDir(__DIR__);
     $ssr->useEngine($engine);
-    $html = $ssr->render('index.js', 'Meow', ['name' => 'Dolly'], [
+    $html = $ssr->render('build/index.js', 'Meow', ['name' => 'Dolly'], [
         'ssr' => true,
     ]);
    
     // Load JS libs on client 
-    echo '<script src="index.js"></script>';
+    echo '<script src="build/index.js"></script>';
    
     // Print server-side rendered component on client
     echo $html;
     ```
-
-The file structure of the example:
-```console
-.
-..
-├── node_modules
-├── vendor
-├── composer.json
-├── package.json
-├── webpack.config.js
-├── tsconfig.json
-├── meow.tsx
-├── index.ts
-├── index.js
-└── index.php
-```
 
 Cache
 -----
