@@ -31,13 +31,12 @@ class Twig implements RendererInterface
      * @param string $template
      * @param array $data
      * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function render(string $template, array $data = []): string
     {
-        try {
-            return $this->twig->render($template, $data);
-        } catch (\Exception $exception) {
-            return '';
-        }
+        return $this->twig->render($template, $data);
     }
 }
