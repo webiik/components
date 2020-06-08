@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "Render JS components within PHP.",
   "main": "Js/build/registerReactComponent.js",
-  "files": [
-    "Js/build"
-  ],
+  "types": "Js/build/registerReactComponent.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
