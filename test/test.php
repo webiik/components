@@ -354,7 +354,8 @@ $container->addService('\Webiik\View\View', function (\Webiik\Container\Containe
 });
 /** @var \Webiik\View\View $view */
 $view = $container->get('\Webiik\View\View');
-echo $view->render('test.twig', ['name' => 'Dolly', 'link' => $translation->get('route', true)]);
+echo $view->render('test.twig',
+    ['name' => 'Dolly', 'link' => '<a href="' . $router->getURL($route->getName()) . '">Go home!</a>']);
 
 // Test Validator
 echo '<b>Validator</b></br>';
@@ -514,6 +515,22 @@ $chc = new \Webiik\CurlHttpClient\CurlHttpClient();
 //    // 4. User and app access_tokens are valid, user and app are authorized by Facebook
 //    // Access protected resources...
 //}
+
+// Test Ssr
+$ssr = new Webiik\Ssr\Ssr();
+//$ssr->useEngine(new Webiik\Ssr\Engines\V8js());
+$nodeJs = new Webiik\Ssr\Engines\NodeJs();
+$nodeJs->setTmpDir(__DIR__ . '/tmp');
+$ssr->useEngine($nodeJs);
+$ssr->setCacheDir(__DIR__ . '/tmp');
+echo '<script>' . file_get_contents('MeowName.js') . '</script>';
+$res = $ssr->render(
+    'MeowName.js',
+    'MeowName',
+    ['name' => 'Molly'],
+    ['ssr' => true, 'cache' => 'MeowName']
+);
+echo $res;
 
 // Show page content
 echo 'Meow!<hr/>';
