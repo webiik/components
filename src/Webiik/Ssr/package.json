@@ -1,9 +1,13 @@
 {
   "name": "@webiik/render-js-components",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Render JS components within PHP.",
+  "types": "Js/build/index.d.ts",
   "main": "Js/build/registerReactComponent.js",
-  "types": "Js/build/registerReactComponent.d.ts",
+  "files": [
+    "Js/build/index.d.ts",
+    "Js/build/registerReactComponent.js"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
