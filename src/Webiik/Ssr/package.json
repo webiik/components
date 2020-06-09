@@ -2,10 +2,10 @@
   "name": "@webiik/render-js-components",
   "version": "1.0.2",
   "description": "Render JS components within PHP.",
-  "types": "Js/build/index.d.ts",
   "main": "Js/build/registerReactComponent.js",
+  "types": "Js/build/registerReactComponent.d.ts",
   "files": [
-    "Js/build/index.d.ts",
+    "Js/build/registerReactComponent.d.ts",
     "Js/build/registerReactComponent.js"
   ],
   "scripts": {
@@ -31,12 +31,12 @@
   "license": "MIT",
   "homepage": "https://github.com/webiik/ssr",
   "devDependencies": {
-    "@types/react": "^16.9.23",
-    "@types/react-dom": "^16.9.5",
-    "typescript": "^3.7.4"
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "typescript": "next"
   },
   "dependencies": {
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0"
+    "react": "latest",
+    "react-dom": "latest"
   }
 }
