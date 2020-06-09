@@ -63,7 +63,7 @@ This example uses Webpack to bundle JS. You can use your favorite JS bundler.
 
     Edit `index.js` to:
     ```js
-    import {registerReactComponent} from 'registerReactComponent';
+    import {registerReactComponent} from '@webiik/render-js-components';
     import {Meow} from 'meow';
     
     registerReactComponent({Meow});
