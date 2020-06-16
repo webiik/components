@@ -1,6 +1,6 @@
 {
   "name": "@webiik/render-js-components",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Render JS components within PHP.",
   "main": "Js/build/registerReactComponent.js",
   "types": "Js/build/registerReactComponent.d.ts",
