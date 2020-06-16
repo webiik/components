@@ -35,7 +35,7 @@
     "@types/react-dom": "latest",
     "typescript": "next"
   },
-  "dependencies": {
+  "peerDependencies": {
     "react": "latest",
     "react-dom": "latest"
   }
