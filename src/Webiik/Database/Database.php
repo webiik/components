@@ -63,6 +63,7 @@ class Database
                 $this->database[$name]['config'][4],
                 $this->database[$name]['config'][5]
             );
+            $this->database[$name]['pdo']->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
 
         foreach ($this->database[$name]['exec'] as $query => $params) {
