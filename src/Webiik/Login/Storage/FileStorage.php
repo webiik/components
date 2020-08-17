@@ -88,7 +88,7 @@ class FileStorage implements StorageInterface
             return;
         }
         $data['expiration'] = (int)($_SERVER['REQUEST_TIME'] + $ttl);
-        $this->store(...$data);
+        $this->store($data['uid'], $data['selector'], $data['key'], $data['expiration']);
     }
 
     /**
