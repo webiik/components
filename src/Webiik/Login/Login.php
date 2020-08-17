@@ -210,7 +210,7 @@ class Login
 
             // Update permanent login cookie and identifiers time
             $this->updatePermanentCookieExpiration();
-            $this->getStorage()->updateExpiration($cookieTokens['selector'], $this->permanentLoginDuration);
+            $this->getStorage()->updateExpiration($cookieTokens['selector'], $this->permanentLoginDuration * 24 * 60 * 60);
 
             // Login the user to avoid repeated permanent login checks and so speed up authentication
             $this->login($identifierData['uid'], false);
@@ -342,7 +342,6 @@ class Login
      */
     private function updatePermanentCookieExpiration(): void
     {
-        $this->cookie->delCookie($this->permanentCookieName);
         $this->cookie->setCookie(
             $this->permanentCookieName,
             $this->cookie->getCookie($this->permanentCookieName),
