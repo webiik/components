@@ -100,6 +100,7 @@ class Container extends \Pimple\Container
      * @param string $methodName
      * @return array
      * @throws \ReflectionException
+     * @throws \Exception
      */
     private function prepareMethodParameters(string $className, string $methodName): array
     {
@@ -114,19 +115,27 @@ class Container extends \Pimple\Container
         foreach ($methodParams as $methodParam) {
             // Get service name
             $serviceName = $methodParam->getName();
+            $serviceType = $methodParam->getType();
 
-            // If parameter type is a class, use class name or doc block paramType as service name
-            if ($methodParam->getClass()) {
-                $serviceName = $methodParam->getClass()->getName();
+            // If service type is a class, use class name or doc block paramType as service name
+            if ($serviceType) {
 
-                // If param type is described in method's doc block
-                // use as service name param type from doc block instead of class name.
-                // Also Prevent to update mismatched params, eg. param name
-                // is different in doc block than in method definition.
-                if (isset($methodDocBlockParams[$methodParam->getName()])) {
-                    // Update only params with paramType started with lower case 'ws'
-                    if (preg_match('/ws[A-Z]/', $methodDocBlockParams[$methodParam->getName()])) {
-                        $serviceName = $methodDocBlockParams[$methodParam->getName()];
+                if ($serviceType instanceof \ReflectionUnionType) {
+                    throw new \Exception('Class: Container, Service parameter `$' . $serviceName . '` can\'t be union type.');
+                }
+
+                if ($serviceType instanceof \ReflectionNamedType && !$serviceType->isBuiltin()) {
+                    $serviceName = $serviceType->getName();
+
+                    // If param type is described in method's doc block
+                    // use as service name param type from doc block instead of class name.
+                    // Also Prevent to update mismatched params, eg. param name
+                    // is different in doc block than in method definition.
+                    if (isset($methodDocBlockParams[$methodParam->getName()])) {
+                        // Update only params with paramType starting with lower case 'ws'
+                        if (preg_match('/^ws[A-Z]/', $methodDocBlockParams[$methodParam->getName()])) {
+                            $serviceName = $methodDocBlockParams[$methodParam->getName()];
+                        }
                     }
                 }
             }
