@@ -1,6 +1,6 @@
 {
   "name": "@webiik/render-js-components",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Render JS components within PHP.",
   "main": "Js/build/registerReactComponent.js",
   "types": "Js/build/registerReactComponent.d.ts",
@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "typescript": "next"
+    "typescript": "latest"
   },
   "peerDependencies": {
     "react": "latest",

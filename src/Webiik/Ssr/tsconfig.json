@@ -2,13 +2,13 @@
   "compilerOptions": {
     "outDir": "Js/build",
     "module": "es6",
-    "target": "es6",
+    "target": "es5",
     "jsx": "react",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "declaration": true,
-    "lib": ["es6", "DOM"]
+    "lib": ["ES5", "DOM"]
   },
   "include": ["Js/src"],
   "exclude": ["node_modules", "**/__tests__/*"]
